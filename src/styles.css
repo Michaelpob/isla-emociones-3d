@@ -300,15 +300,17 @@ p {
 .game-prompt {
   position: absolute;
   left: 50%;
-  bottom: clamp(18px, 6vw, 46px);
+  top: clamp(14px, 4vw, 34px);
   width: min(320px, calc(100vw - 32px));
-  padding: 12px 18px;
+  padding: 10px 16px;
   border-radius: 8px;
   background: rgba(16, 44, 54, 0.78);
   color: #ffffff;
   font-weight: 900;
+  font-size: 0.82rem;
   text-align: center;
   transform: translateX(-50%);
+  z-index: 15;
 }
 
 .icon-button {
@@ -1125,5 +1127,17 @@ p {
 
   .game-prompt {
     bottom: 80px;
+  }
+
+  .lever-panel {
+    bottom: 20px;
+  }
+
+  .lever-track {
+    height: 120px;
+  }
+
+  .volcano-prompt {
+    display: none !important;
   }
 }
