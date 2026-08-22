@@ -301,7 +301,7 @@ export class VolcanoControlGame {
 
     this.rocks.forEach((rock) => {
       if (rock.clicked) return;
-      rock.vy += 3.5 * delta;
+      rock.vy += 2.8 * delta;
       rock.y -= rock.vy * delta;
       const pct = Math.max(0, Math.min(1, 1 - (rock.y / 5)));
       rock.element.style.left = `${50 + rock.x * 6}%`;

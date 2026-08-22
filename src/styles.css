@@ -723,9 +723,9 @@ p {
 
 .lava-rock {
   position: absolute;
-  width: 44px;
-  height: 44px;
-  margin: -22px 0 0 -22px;
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
   border: 2px solid #ff6600;
   border-radius: 50%;
   background: radial-gradient(circle, #ff3300, #cc1100);
@@ -763,9 +763,9 @@ p {
 /* Vent seals */
 .vent-seal {
   position: absolute;
-  width: 40px;
-  height: 40px;
-  margin: -20px 0 0 -20px;
+  width: 52px;
+  height: 52px;
+  margin: -26px 0 0 -26px;
   border: 2px dashed #ffb15c;
   border-radius: 50%;
   background: rgba(255, 120, 50, 0.3);
