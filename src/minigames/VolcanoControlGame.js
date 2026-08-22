@@ -40,7 +40,35 @@ export class VolcanoControlGame {
     this.root.className = 'minigame minigame--volcano';
     this.root.innerHTML = `
       <div class="game-canvas" data-game-canvas></div>
-      <section class="game-hud volcano-hud">
+      <div class="instructions-overlay" data-instructions>
+        <section class="instructions-panel">
+          <p class="eyebrow">Enojo</p>
+          <h2>Control del Volcan</h2>
+          <p class="instructions-text">
+            Un volcan esta a punto de explotar. Tu objetivo es mantener la presion bajo control durante 35 segundos.
+          </p>
+          <div class="instructions-list">
+            <div class="instruction-item">
+              <span class="instruction-icon">🎚️</span>
+              <span>Mueve las <strong>4 palancas</strong> hacia su zona verde para bajar la presion. Despacio, no las muevas bruscamente.</span>
+            </div>
+            <div class="instruction-item">
+              <span class="instruction-icon">🔥</span>
+              <span>Toca las <strong>rocas de lava</strong> antes de que caigan para reducir presion.</span>
+            </div>
+            <div class="instruction-item">
+              <span class="instruction-icon">💨</span>
+              <span>Sella los <strong>respiraderos</strong> que aparecen para evitar que suba la presion.</span>
+            </div>
+          </div>
+          <p class="instructions-warning">Si la presion llega al 100%, el volcan explota.</p>
+          <div class="instructions-actions">
+            <button class="primary-action" type="button" data-start-game>Comenzar</button>
+            <button class="secondary-action" type="button" data-exit-game>Volver</button>
+          </div>
+        </section>
+      </div>
+      <section class="game-hud volcano-hud" style="display:none" data-game-hud>
         <div>
           <p class="eyebrow">Enojo</p>
           <h2>Control del Volcan</h2>
@@ -50,12 +78,12 @@ export class VolcanoControlGame {
           <span><strong data-time>35</strong>s</span>
         </div>
       </section>
-      <div class="pressure-bar-wrap" data-pressure-bar-wrap>
+      <div class="pressure-bar-wrap" data-pressure-bar-wrap style="display:none">
         <div class="pressure-bar" data-pressure-bar></div>
         <div class="pressure-zone" data-pressure-zone></div>
         <div class="pressure-marker" data-pressure-marker></div>
       </div>
-      <div class="lever-panel" data-lever-panel>
+      <div class="lever-panel" data-lever-panel style="display:none">
         ${this.levers.map((l) => `
           <div class="lever-col" data-lever-col="${l.id}">
             <div class="lever-track" data-lever-track="${l.id}">
@@ -68,17 +96,24 @@ export class VolcanoControlGame {
         `).join('')}
       </div>
       <div class="action-zone" data-action-zone></div>
-      <div class="game-prompt volcano-prompt" data-prompt>Mantén la presion estable</div>
-      <button class="icon-button game-exit" type="button" aria-label="Volver al mapa" title="Volver al mapa">X</button>
+      <div class="game-prompt volcano-prompt" data-prompt style="display:none">Mantén la presion estable</div>
+      <button class="icon-button game-exit" type="button" aria-label="Volver al mapa" title="Volver al mapa" style="display:none" data-exit-x>X</button>
     `;
     this.host.appendChild(this.root);
     this.canvasHost = this.root.querySelector('[data-game-canvas]');
+    this.gameHud = this.root.querySelector('[data-game-hud]');
     this.pressureEl = this.root.querySelector('[data-pressure]');
     this.timeEl = this.root.querySelector('[data-time]');
     this.promptEl = this.root.querySelector('[data-prompt]');
     this.pressureBar = this.root.querySelector('[data-pressure-bar]');
     this.actionZone = this.root.querySelector('[data-action-zone]');
-    this.root.querySelector('.game-exit').addEventListener('click', this.onExit);
+    this.leverPanel = this.root.querySelector('[data-lever-panel]');
+    this.pressureBarWrap = this.root.querySelector('[data-pressure-bar-wrap]');
+    this.exitX = this.root.querySelector('[data-exit-x]');
+
+    this.root.querySelector('[data-start-game]').addEventListener('click', () => this.startGame());
+    this.root.querySelector('[data-exit-game]').addEventListener('click', this.onExit);
+    this.exitX.addEventListener('click', this.onExit);
 
     this.levers.forEach((l) => {
       const track = this.root.querySelector(`[data-lever-track="${l.id}"]`);
@@ -100,6 +135,16 @@ export class VolcanoControlGame {
 
     this.setupScene();
     this.resize();
+  }
+
+  startGame() {
+    const instructions = this.root.querySelector('[data-instructions]');
+    if (instructions) instructions.remove();
+    this.gameHud.style.display = '';
+    this.pressureBarWrap.style.display = '';
+    this.leverPanel.style.display = '';
+    this.promptEl.style.display = '';
+    this.exitX.style.display = '';
     this.running = true;
     this.animate();
   }
