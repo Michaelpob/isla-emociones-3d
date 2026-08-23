@@ -28,6 +28,14 @@ export function createIslandMesh(island) {
 
   addDecorations(group, island);
 
+  if (island.emoji) {
+    const sprite = createEmojiSprite(island.emoji);
+    sprite.name = `${island.id}-emoji`;
+    sprite.position.y = island.height * 0.35 + 1.6;
+    sprite.scale.set(0.7, 0.7, 1);
+    group.add(sprite);
+  }
+
   const ring = new THREE.Mesh(
     new THREE.TorusGeometry(island.radius * 1.35, 0.035, 8, 48),
     new THREE.MeshBasicMaterial({
@@ -44,6 +52,20 @@ export function createIslandMesh(island) {
   group.add(ring);
 
   return group;
+}
+
+function createEmojiSprite(emoji) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.font = '96px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(emoji, 64, 68);
+  const texture = new THREE.CanvasTexture(canvas);
+  const material = new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false });
+  return new THREE.Sprite(material);
 }
 
 export function setIslandHover(group, isHovered) {

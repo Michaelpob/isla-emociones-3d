@@ -296,7 +296,7 @@ export class EmotionIslandApp {
     const completed = this.completed.has(island.id);
     return `
       <button class="island-chip" style="--chip:${island.palette.ui}" data-island-id="${island.id}" type="button">
-        <span class="chip-dot"></span>
+        <span class="chip-emoji">${island.emoji || ''}</span>
         <span>
           <strong>${island.name}</strong>
           <small>${minigameLabels[island.minigame]}</small>
