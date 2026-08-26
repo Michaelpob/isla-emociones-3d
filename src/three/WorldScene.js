@@ -1,5 +1,36 @@
 import * as THREE from 'three';
 import { createIslandMesh, setIslandHover } from './createIslandMesh.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+
+// ART PASS - Mejora visual sin tocar lógica de juego
+// Antes: renderer sin toneMapping, sombras 1024, Fog lineal, océano plano color #3caed4
+// Después: ACES toneMapping, sombras 2048 antialiased, FogExp2, océano shader con olas + fresnel, sky gradiente, partículas
+
+const VignetteShader = {
+  uniforms: {
+    tDiffuse: { value: null },
+    darkness: { value: 0.35 },
+    offset: { value: 0.95 }
+  },
+  vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader: `
+    uniform sampler2D tDiffuse;
+    uniform float darkness;
+    uniform float offset;
+    varying vec2 vUv;
+    void main(){
+      vec4 texel = texture2D(tDiffuse, vUv);
+      vec2 uv = (vUv - vec2(0.5)) * vec2(offset);
+      float vig = clamp(1.0 - dot(uv, uv), 0.0, 1.0);
+      texel.rgb *= mix(1.0 - darkness * 0.5, 1.0, vig);
+      gl_FragColor = texel;
+    }
+  `
+};
 
 export class WorldScene {
   constructor(canvasHost, islands, callbacks) {
@@ -50,8 +81,11 @@ export class WorldScene {
   }
 
   mount() {
+    const isCoarse = window.matchMedia('(pointer: coarse)').matches;
+    this.isCoarse = isCoarse;
+
     this.renderer = new THREE.WebGLRenderer({
-      antialias: true,
+      antialias: !isCoarse,
       alpha: false,
       powerPreference: 'high-performance'
     });
@@ -59,17 +93,25 @@ export class WorldScene {
     this.renderer.setClearColor('#88d5eb', 1);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    // ART PASS: tone mapping físico para colores no planos
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1.12;
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.canvasHost.appendChild(this.renderer.domElement);
 
     this.scene = new THREE.Scene();
-    this.scene.fog = new THREE.Fog('#88d5eb', 8, 23);
+    // ART PASS: Fog exponencial más físico que lineal
+    this.scene.fog = new THREE.FogExp2('#88d5eb', 0.032);
     this.camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
 
     this.addLights();
+    this.addSky();
     this.addOcean();
     this.addIslands();
     this.addPlayer();
     this.addAmbientMotion();
+    this.addDustParticles();
+    this.setupPostProcessing();
 
     this.renderer.domElement.addEventListener('pointerdown', this.onPointerDown);
     window.addEventListener('pointermove', this.onPointerMove);
@@ -91,6 +133,7 @@ export class WorldScene {
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('keyup', this.onKeyUp);
     window.removeEventListener('resize', this.resize);
+    this.composer?.dispose();
     this.renderer.dispose();
     this.canvasHost.replaceChildren();
   }
@@ -119,25 +162,144 @@ export class WorldScene {
     this.cameraTarget.set(island.position[0], 0.75, island.position[2]);
   }
 
+  setupPostProcessing() {
+    // ART PASS: pipeline ligero - solo en escritorio alta calidad, en móvil calidad reducida
+    const size = new THREE.Vector2();
+    this.renderer.getSize(size);
+    this.composer = new EffectComposer(this.renderer);
+    this.composer.addPass(new RenderPass(this.scene, this.camera));
+
+    // Bloom sutil solo para emisivos (cristales, badge) y reflejos agua
+    const bloomStrength = this.isCoarse ? 0.18 : 0.32;
+    const bloomRadius = 0.45;
+    const bloomThreshold = 0.82;
+    this.bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(size.x, size.y),
+      bloomStrength,
+      bloomRadius,
+      bloomThreshold
+    );
+    this.composer.addPass(this.bloomPass);
+
+    // Vignette muy sutil cinematográfico
+    this.vignettePass = new ShaderPass(VignetteShader);
+    this.composer.addPass(this.vignettePass);
+
+    this.composer.addPass(new OutputPass());
+  }
+
   addLights() {
-    const hemi = new THREE.HemisphereLight('#fff6d5', '#497b96', 2.2);
+    // ART PASS: iluminación PBR físicamente correcta
+    const hemi = new THREE.HemisphereLight('#fff6d5', '#4a7a96', 1.4);
     this.scene.add(hemi);
-    const sun = new THREE.DirectionalLight('#ffffff', 2.45);
-    sun.position.set(-4, 7, 4);
+
+    const sun = new THREE.DirectionalLight('#ffffff', 2.6);
+    sun.position.set(-4, 8, 4);
     sun.castShadow = true;
-    sun.shadow.mapSize.set(1024, 1024);
-    sun.shadow.camera.left = -9;
-    sun.shadow.camera.right = 9;
-    sun.shadow.camera.top = 9;
-    sun.shadow.camera.bottom = -9;
+    // Sombras suaves de mayor resolución, adaptativa según dispositivo
+    const shadowSize = this.isCoarse ? 1024 : 2048;
+    sun.shadow.mapSize.set(shadowSize, shadowSize);
+    sun.shadow.camera.left = -10;
+    sun.shadow.camera.right = 10;
+    sun.shadow.camera.top = 10;
+    sun.shadow.camera.bottom = -10;
+    sun.shadow.camera.near = 0.5;
+    sun.shadow.camera.far = 30;
+    sun.shadow.bias = -0.0004;
+    sun.shadow.normalBias = 0.015;
     this.scene.add(sun);
+    this.sunLight = sun;
+
+    // Luz de relleno fría para contraste
+    const rim = new THREE.DirectionalLight('#bfe8ff', 0.32);
+    rim.position.set(5, 4, -5);
+    this.scene.add(rim);
+
+    // Luz ambiental suave para no dejar sombras negras
+    const ambient = new THREE.AmbientLight('#88d5eb', 0.28);
+    this.scene.add(ambient);
+  }
+
+  addSky() {
+    // ART PASS: skybox gradiente sutil sin cambiar paleta - mismo tono #88d5eb pero con profundidad
+    const skyGeo = new THREE.SphereGeometry(80, 24, 16);
+    const skyMat = new THREE.ShaderMaterial({
+      uniforms: {
+        topColor: { value: new THREE.Color('#b8e6f5') },
+        midColor: { value: new THREE.Color('#88d5eb') },
+        bottomColor: { value: new THREE.Color('#a8dff0') }
+      },
+      vertexShader: `varying vec3 vWorldPosition; void main(){ vec4 wp = modelMatrix*vec4(position,1.0); vWorldPosition = wp.xyz; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+      fragmentShader: `
+        uniform vec3 topColor;
+        uniform vec3 midColor;
+        uniform vec3 bottomColor;
+        varying vec3 vWorldPosition;
+        void main(){
+          float h = normalize(vWorldPosition).y;
+          vec3 color = mix(bottomColor, midColor, smoothstep(-0.2, 0.3, h));
+          color = mix(color, topColor, smoothstep(0.3, 0.8, h));
+          gl_FragColor = vec4(color, 1.0);
+        }
+      `,
+      side: THREE.BackSide,
+      depthWrite: false
+    });
+    const sky = new THREE.Mesh(skyGeo, skyMat);
+    this.scene.add(sky);
   }
 
   addOcean() {
-    const ocean = new THREE.Mesh(
-      new THREE.CircleGeometry(18, 80),
-      new THREE.MeshStandardMaterial({ color: '#3caed4', roughness: 0.72, metalness: 0.02 })
-    );
+    // ART PASS: shader agua con olas sutiles + fresnel, misma paleta #3caed4 pero con vida
+    this.oceanMat = new THREE.ShaderMaterial({
+      uniforms: {
+        time: { value: 0 },
+        deepColor: { value: new THREE.Color('#2f8fb8') },
+        shallowColor: { value: new THREE.Color('#3caed4') },
+        sunDir: { value: new THREE.Vector3(-0.4, 0.7, 0.4).normalize() },
+        cameraPos: { value: new THREE.Vector3() }
+      },
+      vertexShader: `
+        uniform float time;
+        varying vec2 vUv;
+        varying vec3 vWorldPos;
+        varying vec3 vNormal;
+        varying vec3 vViewDir;
+        void main(){
+          vUv = uv;
+          vec3 pos = position;
+          float w1 = sin(pos.x * 1.1 + time * 0.3) * 0.05;
+          float w2 = sin(pos.z * 1.6 + time * 0.45) * 0.035;
+          float w3 = sin((pos.x+pos.z)*0.85 + time * 0.2) * 0.025;
+          pos.y += w1 + w2 + w3;
+          vec3 n = normal;
+          vWorldPos = (modelMatrix * vec4(pos,1.0)).xyz;
+          vNormal = normalize(normalMatrix * n);
+          vViewDir = normalize(cameraPosition - vWorldPos);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(pos,1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 deepColor;
+        uniform vec3 shallowColor;
+        uniform vec3 sunDir;
+        varying vec3 vWorldPos;
+        varying vec3 vNormal;
+        varying vec3 vViewDir;
+        void main(){
+          float fresnel = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 3.0);
+          vec3 reflDir = reflect(-vViewDir, vNormal);
+          float sunRefl = pow(max(dot(reflDir, sunDir), 0.0), 32.0);
+          float wave = sin(vWorldPos.x*1.8 + vWorldPos.z*1.2);
+          vec3 base = mix(deepColor, shallowColor, 0.5 + wave*0.07);
+          vec3 color = mix(base, vec3(0.9, 0.97, 1.0), fresnel * 0.16);
+          color += vec3(1.0) * sunRefl * 0.1;
+          gl_FragColor = vec4(color, 1.0);
+        }
+      `
+    });
+
+    const ocean = new THREE.Mesh(new THREE.CircleGeometry(18, 80), this.oceanMat);
     ocean.name = 'ocean';
     ocean.rotation.x = -Math.PI / 2;
     ocean.position.y = -0.08;
@@ -147,7 +309,7 @@ export class WorldScene {
     for (let i = 0; i < 8; i += 1) {
       const wave = new THREE.Mesh(
         new THREE.TorusGeometry(2.1 + i * 1.7, 0.012, 6, 72),
-        new THREE.MeshBasicMaterial({ color: i % 2 ? '#b7efff' : '#e5fbff', transparent: true, opacity: 0.18 })
+        new THREE.MeshBasicMaterial({ color: i % 2 ? '#b7efff' : '#e5fbff', transparent: true, opacity: 0.14 })
       );
       wave.rotation.x = Math.PI / 2;
       wave.position.y = 0.005;
@@ -164,7 +326,7 @@ export class WorldScene {
 
     const body = new THREE.Mesh(
       new THREE.CapsuleGeometry(0.18, 0.35, 6, 10),
-      new THREE.MeshStandardMaterial({ color: this.playerColor, roughness: 0.6, flatShading: true })
+      new THREE.MeshStandardMaterial({ color: this.playerColor, roughness: 0.6, metalness: 0.04, flatShading: true })
     );
     body.name = 'player-body';
     body.position.y = 0.35;
@@ -227,7 +389,7 @@ export class WorldScene {
   }
 
   addAmbientMotion() {
-    const cloudMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.9, flatShading: true });
+    const cloudMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.9, flatShading: true, transparent: true, opacity: 0.92 });
     for (let i = 0; i < 7; i += 1) {
       const cloud = new THREE.Group();
       for (let p = 0; p < 3; p += 1) {
@@ -243,6 +405,29 @@ export class WorldScene {
       this.scene.add(cloud);
       this.clouds.push(cloud);
     }
+  }
+
+  addDustParticles() {
+    // ART PASS: partículas ambientales muy sutiles, no distraen jugabilidad
+    const count = this.isCoarse ? 40 : 70;
+    const positions = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 20;
+      positions[i * 3 + 1] = Math.random() * 4 + 0.5;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const mat = new THREE.PointsMaterial({
+      color: '#ffffff',
+      size: 0.018,
+      transparent: true,
+      opacity: 0.18,
+      sizeAttenuation: true,
+      depthWrite: false
+    });
+    this.dustParticles = new THREE.Points(geo, mat);
+    this.scene.add(this.dustParticles);
   }
 
   updatePlayer(delta, elapsed) {
@@ -413,6 +598,10 @@ export class WorldScene {
     this.renderer.setPixelRatio(this.getPixelRatio());
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
+    if (this.composer) {
+      this.composer.setSize(width, height);
+      if (this.bloomPass) this.bloomPass.resolution.set(width, height);
+    }
   };
 
   animate = () => {
@@ -424,6 +613,11 @@ export class WorldScene {
     this.updatePlayer(delta, elapsed);
     this.updateCamera(delta);
 
+    if (this.oceanMat) {
+      this.oceanMat.uniforms.time.value = elapsed;
+      this.oceanMat.uniforms.cameraPos.value.copy(this.camera.position);
+    }
+
     this.waves.forEach((wave) => {
       wave.rotation.z += wave.userData.waveSpeed * delta;
       wave.position.y = 0.005 + Math.sin(elapsed * 0.7 + wave.userData.wavePhase) * 0.006;
@@ -433,6 +627,19 @@ export class WorldScene {
       cloud.position.y = cloud.userData.baseY + Math.sin(elapsed * 0.38 + cloud.userData.cloudPhase) * 0.045;
       if (cloud.position.x > 9) cloud.position.x = -9;
     });
+
+    if (this.dustParticles) {
+      const pos = this.dustParticles.geometry.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        let y = pos.getY(i);
+        y += delta * 0.02;
+        if (y > 4.5) y = 0.3;
+        pos.setY(i, y);
+        pos.setX(i, pos.getX(i) + Math.sin(elapsed * 0.3 + i) * delta * 0.01);
+      }
+      pos.needsUpdate = true;
+    }
+
     this.islandGroups.forEach((group, id) => {
       const phase = group.userData.floatPhase;
       group.position.y = Math.sin(elapsed * 0.48 + phase) * 0.026 + Math.sin(elapsed * 0.91 + phase * 0.4) * 0.01;
@@ -449,12 +656,17 @@ export class WorldScene {
       }
     });
 
-    this.renderer.render(this.scene, this.camera);
+    if (this.composer) {
+      this.composer.render();
+    } else {
+      this.renderer.render(this.scene, this.camera);
+    }
     requestAnimationFrame(this.animate);
   };
 
   getPixelRatio() {
     const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
-    return Math.min(window.devicePixelRatio || 1, coarsePointer ? 1.25 : 1.5);
+    // ART PASS: límite adaptativo para no penalizar móviles
+    return Math.min(window.devicePixelRatio || 1, coarsePointer ? 1.25 : 1.6);
   }
 }

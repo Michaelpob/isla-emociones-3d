@@ -79,9 +79,11 @@ export function setIslandHover(group, isHovered) {
 function createLowPolyCylinder(radius, height, color) {
   const geometry = new THREE.CylinderGeometry(radius * 0.88, radius, height, 9, 1, false);
   geometry.computeVertexNormals();
+  // ART PASS: PBR ajustado - roughness específico por superficie, mismo color pero respuesta física más creíble
+  const isBeach = color === '#f6e6a9';
   const material = new THREE.MeshStandardMaterial({
     color,
-    roughness: 0.82,
+    roughness: isBeach ? 0.9 : 0.78,
     metalness: 0.02,
     flatShading: true
   });
@@ -103,12 +105,12 @@ function makeDecoration(item, island) {
     const tree = new THREE.Group();
     const trunk = new THREE.Mesh(
       new THREE.CylinderGeometry(0.06, 0.08, 0.45, 6),
-      new THREE.MeshStandardMaterial({ color: '#8d5a3b', flatShading: true })
+      new THREE.MeshStandardMaterial({ color: '#7a4a2e', roughness: 0.88, flatShading: true })
     );
     trunk.position.y = 0.45;
     const top = new THREE.Mesh(
       new THREE.ConeGeometry(item.size ?? 0.28, 0.62, 7),
-      new THREE.MeshStandardMaterial({ color: island.palette.foliage, flatShading: true })
+      new THREE.MeshStandardMaterial({ color: island.palette.foliage, roughness: 0.82, flatShading: true })
     );
     top.position.y = 0.88;
     tree.add(trunk, top);
@@ -122,7 +124,9 @@ function makeDecoration(item, island) {
       new THREE.MeshStandardMaterial({
         color: island.palette.glow,
         emissive: island.palette.glow,
-        emissiveIntensity: 0.28,
+        emissiveIntensity: 0.42,
+        roughness: 0.35,
+        metalness: 0.1,
         flatShading: true
       })
     );
@@ -133,7 +137,7 @@ function makeDecoration(item, island) {
 
   const rock = new THREE.Mesh(
     new THREE.DodecahedronGeometry(item.size ?? 0.18, 0),
-    new THREE.MeshStandardMaterial({ color: island.palette.accent, flatShading: true })
+    new THREE.MeshStandardMaterial({ color: island.palette.accent, roughness: 0.88, flatShading: true })
   );
   rock.position.set(item.x, item.y, item.z);
   return rock;
