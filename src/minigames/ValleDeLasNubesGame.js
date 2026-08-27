@@ -120,14 +120,23 @@ export class ValleDeLasNubesGame {
         btn.classList.add(ok?'correct':'wrong');
         if(ok){ this.gotas++; this.addTool('Gota de comprensión'); }
         setTimeout(()=>{
-          this.shell.innerHTML = `
-            <h2>${ok?'¡CORRECTO!':'Casi'}</h2>
-            <p>${ok?'La tristeza puede aparecer ante situaciones que percibimos como pérdidas, separaciones, decepciones o cambios importantes.':'Esta situación puede generar diferentes emociones. La tristeza suele relacionarse con pérdida, separación, decepción o cambio significativo.'}</p>
-            ${ok?'<p><span class="vn-badge">+ Gota de comprensión</span></p>':''}
-            ${this.inventoryHTML()}
-            <div class="vn-actions"><button class="primary-action" data-next>Siguiente</button></div>
-          `;
-          this.shell.querySelector('[data-next]').addEventListener('click', ()=>this.showEtapa2());
+          if(ok){
+            this.shell.innerHTML = `
+              <h2>¡CORRECTO!</h2>
+              <p>La tristeza puede aparecer ante situaciones que percibimos como pérdidas, separaciones, decepciones o cambios importantes.</p>
+              <p><span class="vn-badge">+ Gota de comprensión</span></p>
+              ${this.inventoryHTML()}
+              <div class="vn-actions"><button class="primary-action" data-next>Atravesar →</button></div>
+            `;
+            this.shell.querySelector('[data-next]').addEventListener('click', ()=>this.showEtapa2());
+          } else {
+            this.shell.innerHTML = `
+              <h2>No es esa emoción</h2>
+              <p>Intenta de nuevo — observa la postura y la expresión.</p>
+              <div class="vn-actions"><button class="primary-action" data-retry>🔄 Volver a intentar</button></div>
+            `;
+            this.shell.querySelector('[data-retry]').addEventListener('click', ()=>this.showEtapa1());
+          }
         }, 450);
       }, {once:true});
     });
@@ -183,22 +192,21 @@ export class ValleDeLasNubesGame {
       this.shell.innerHTML = `
         <h2>¡Bien observado!</h2>
         <p>Has aprendido a reconocer algunas manifestaciones asociadas a la tristeza.</p>
-        <p><span class="vn-badge">+ 5 puntos</span></p>
+        <p><span class="vn-badge">+ 5 puntos</span> · Atraviesas el espejo</p>
         ${this.inventoryHTML()}
-        <div class="vn-actions"><button class="primary-action" data-next>Continuar</button></div>
+        <div class="vn-actions"><button class="primary-action" data-next>Atravesar →</button></div>
       `;
       this.shell.querySelector('[data-next]').addEventListener('click', ()=>this.showIntensity(false));
     };
     const fail = ()=>{
-      running=false;
-      this.puntos+=2;
+      running=false; clearInterval(timer); clearInterval(spawner);
       this.shell.innerHTML = `
-        <h2>¡Buen intento!</h2>
-        <p>Has aprendido a reconocer algunas manifestaciones asociadas a la tristeza.</p>
-        <p><span class="vn-badge">+ 2 puntos</span></p>
-        <div class="vn-actions"><button class="primary-action" data-next>Continuar</button></div>
+        <h2>Te faltaron señales</h2>
+        <p>Necesitas atrapar 6 para atravesar el espejo. Atrapaste ${collected}.</p>
+        <p>Inténtalo de nuevo — concéntrate en las señales de tristeza.</p>
+        <div class="vn-actions"><button class="primary-action" data-retry>🔄 Volver a intentar</button></div>
       `;
-      this.shell.querySelector('[data-next]').addEventListener('click', ()=>this.showIntensity(false));
+      this.shell.querySelector('[data-retry]').addEventListener('click', ()=>this.showEtapa2());
     };
     spawn();
   }
@@ -296,11 +304,16 @@ export class ValleDeLasNubesGame {
       const ok=opts[Number(b.dataset.i)].ok;
       b.classList.add(ok?'correct':'wrong');
       setTimeout(()=>{
-        const alta=this.intensidad_inicial==='alta';
-        const msg=alta?'Puedes reconocer el dolor de una situación sin asumir que todo está perdido.':'Has encontrado una nueva perspectiva.<br>Puedes reconocer que una situación es difícil sin asumir que todo está perdido.';
-        this.addTool('Cristal de perspectiva');
-        this.shell.innerHTML=`<h2>${ok?'¡Equilibrado!':'Nueva mirada'}</h2><p>${msg}</p><p><span class="vn-badge">+ Cristal de perspectiva</span></p>${this.inventoryHTML()}<div class="vn-actions"><button class="primary-action" data-next>Continuar</button></div>`;
-        this.shell.querySelector('[data-next]').addEventListener('click', ()=>this.showIntensity(true));
+        if(ok){
+          const alta=this.intensidad_inicial==='alta';
+          const msg=alta?'Puedes reconocer el dolor de una situación sin asumir que todo está perdido.':'Has encontrado una nueva perspectiva.<br>Puedes reconocer que una situación es difícil sin asumir que todo está perdido.';
+          this.addTool('Cristal de perspectiva');
+          this.shell.innerHTML=`<h2>¡Equilibrado!</h2><p>${msg}</p><p><span class="vn-badge">+ Cristal de perspectiva</span></p>${this.inventoryHTML()}<div class="vn-actions"><button class="primary-action" data-next>Atravesar →</button></div>`;
+          this.shell.querySelector('[data-next]').addEventListener('click', ()=>this.showIntensity(true));
+        } else {
+          this.shell.innerHTML=`<h2>Esa idea no ayuda a sentirte mejor</h2><p>Inténtalo de nuevo — busca una interpretación que reconozca la dificultad sin asumir que todo está perdido.</p><div class="vn-actions"><button class="primary-action" data-retry>🔄 Volver a intentar</button></div>`;
+          this.shell.querySelector('[data-retry]').addEventListener('click', ()=>this.gameReevaluacion());
+        }
       }, 350);
     }));
   }
@@ -409,9 +422,14 @@ export class ValleDeLasNubesGame {
       this.shell.querySelectorAll('[data-i]').forEach(c=>c.addEventListener('click',()=>{
         const ok=c.dataset.i==='0'; c.classList.add(ok?'correct':'wrong');
         setTimeout(()=>{
-          this.addTool('Corazón de apoyo');
-          this.shell.innerHTML=`<h2>${ok?'Gracias por compartir':'Intento valioso'}</h2><p>Buscar apoyo puede ayudarte a expresar lo que sientes y afrontar situaciones difíciles.</p><p><span class="vn-badge">+ Corazón de apoyo</span></p>${this.inventoryHTML()}<div class="vn-actions"><button class="primary-action" data-next>Continuar</button></div>`;
-          this.shell.querySelector('[data-next]').addEventListener('click', ()=>this.showIntensity(true));
+          if(ok){
+            this.addTool('Corazón de apoyo');
+            this.shell.innerHTML=`<h2>Gracias por compartir</h2><p>Buscar apoyo puede ayudarte a expresar lo que sientes y afrontar situaciones difíciles.</p><p><span class="vn-badge">+ Corazón de apoyo</span></p>${this.inventoryHTML()}<div class="vn-actions"><button class="primary-action" data-next>Atravesar →</button></div>`;
+            this.shell.querySelector('[data-next]').addEventListener('click', ()=>this.showIntensity(true));
+          } else {
+            this.shell.innerHTML=`<h2>Inténtalo de nuevo</h2><p>Expresar lo que sientes con honestidad ayuda más que ocultarlo.</p><div class="vn-actions"><button class="primary-action" data-retry>🔄 Volver a intentar</button></div>`;
+            this.shell.querySelector('[data-retry]').addEventListener('click', ()=>this.gameApoyo());
+          }
         },300);
       }));
     }));
