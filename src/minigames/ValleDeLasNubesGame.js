@@ -87,7 +87,7 @@ export class ValleDeLasNubesGame {
     return `<div class="vn-steps">${[1,2,3,4].map(i=>`<div class="vn-step ${i<active?'done':''} ${i===active?'active':''}"></div>`).join('')}</div>`;
   }
 
-  // INTRO ultra breve — quitada primera parte textual como pedido
+  // INTRO quitada + Paso1 quitado como pedido — arranca en GENERAR
   showIntro(){
     this.setAtmosphere(null);
     this.shell.innerHTML=`
@@ -95,7 +95,11 @@ export class ValleDeLasNubesGame {
       <h1>BIENVENIDO AL VALLE DE LAS NUBES</h1>
       <div class="vn-actions"><button class="primary-action" data-go>COMENZAR</button></div>
     `;
-    this.shell.querySelector('[data-go]').addEventListener('click',()=>this.paso1_identificar());
+    this.shell.querySelector('[data-go]').addEventListener('click',()=>{
+      this.intensidad_inicial = 'media';
+      this.setAtmosphere('media');
+      this.paso2_generar();
+    });
   }
 
   // 1. IDENTIFICAR EL PROBLEMA — Reconocer qué está generando la dificultad.

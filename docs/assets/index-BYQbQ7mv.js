@@ -4286,7 +4286,7 @@ void main() {
       ${this.stepsBar(0)}
       <h1>BIENVENIDO AL VALLE DE LAS NUBES</h1>
       <div class="vn-actions"><button class="primary-action" data-go>COMENZAR</button></div>
-    `,this.shell.querySelector("[data-go]").addEventListener("click",()=>this.paso1_identificar())}paso1_identificar(){this.shell.innerHTML=`
+    `,this.shell.querySelector("[data-go]").addEventListener("click",()=>{this.intensidad_inicial="media",this.setAtmosphere("media"),this.paso2_generar()})}paso1_identificar(){this.shell.innerHTML=`
       ${this.stepsBar(1)}
       <p class="eyebrow">Paso 1 de 4</p>
       <h2>1. IDENTIFICAR EL PROBLEMA</h2>
