@@ -4366,4 +4366,4 @@ void main() {
         <div class="result-score">${t.score}/${t.target} destellos</div>
         <button class="primary-action" type="button" data-back-map>Volver al mapa</button>
       </section>
-    `,this.overlayRoot.querySelector("[data-back-map]").addEventListener("click",()=>this.showMap())}}const Rm=document.querySelector("#app"),Cm=new Am(Rm);Cm.start();
+    `,this.overlayRoot.querySelector("[data-back-map]").addEventListener("click",()=>this.showMap())}}const Rm=document.querySelector("#app"),Cm=new Am(Rm);Cm.start();function Pm(){let i=document.getElementById("visit-counter");i||(i=document.createElement("div"),i.id="visit-counter",i.className="visit-counter",i.textContent="👁️ cargando...",document.body.appendChild(i)),fetch("https://abacus.jasoncameron.dev/hit/michaelpob-isla-emociones-3d",{cache:"no-store"}).then(t=>t.json()).then(t=>{const e=typeof t.value=="number"?t.value:t.count??0;i.textContent=`👁️ ${Number(e).toLocaleString("es-CO")} visitas`}).catch(()=>{i.textContent="👁️ visitas"})}Pm();
