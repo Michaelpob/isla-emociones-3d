@@ -87,15 +87,12 @@ export class ValleDeLasNubesGame {
     return `<div class="vn-steps">${[1,2,3,4].map(i=>`<div class="vn-step ${i<active?'done':''} ${i===active?'active':''}"></div>`).join('')}</div>`;
   }
 
-  // INTRO breve
+  // INTRO ultra breve — quitada primera parte textual como pedido
   showIntro(){
     this.setAtmosphere(null);
     this.shell.innerHTML=`
       ${this.stepsBar(0)}
       <h1>BIENVENIDO AL VALLE DE LAS NUBES</h1>
-      <p>La tristeza es una emoción que puede aparecer ante pérdidas, separaciones, decepciones, rechazos o cambios significativos.</p>
-      <p>En esta isla aprenderás a reconocerla, identificar su intensidad y utilizar diferentes estrategias para afrontarla.</p>
-      <p>Tu misión será encontrar las herramientas que te permitan continuar el recorrido.</p>
       <div class="vn-actions"><button class="primary-action" data-go>COMENZAR</button></div>
     `;
     this.shell.querySelector('[data-go]').addEventListener('click',()=>this.paso1_identificar());
@@ -127,8 +124,7 @@ export class ValleDeLasNubesGame {
             this.shell.querySelector('[data-retry]').addEventListener('click',()=>this.paso1_identificar());
             return;
           }
-          // mini atrapa 6 + intensidad dentro de IDENTIFICAR
-          this.paso1b_atrapa();
+          this.paso1c_intensidad();
         }, 400);
       },{once:true});
     });
