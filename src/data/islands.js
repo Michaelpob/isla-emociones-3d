@@ -111,7 +111,8 @@ export const islands = [
 
 export const minigameLabels = {
   'joy-stars': 'Destellos en movimiento',
-  'support-rain': 'Lluvia de Apoyo',
+  'support-rain': 'Valle de las Nubes',
+  'valle-nubes': 'Valle de las Nubes',
   'volcano-control': 'Control del Volcan',
   'darkness-light': 'Luz en la Oscuridad',
   'spirit-cleaning': 'Limpieza Espiritual',

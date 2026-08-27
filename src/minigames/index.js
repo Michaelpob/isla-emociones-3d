@@ -5,10 +5,12 @@ import { DarknessLightGame } from './DarknessLightGame.js';
 import { SpiritCleaningGame } from './SpiritCleaningGame.js';
 import { SurpriseBoxesGame } from './SurpriseBoxesGame.js';
 import { ComingSoonGame } from './ComingSoonGame.js';
+import { ValleDeLasNubesGame } from './ValleDeLasNubesGame.js';
 
 export const minigameRegistry = {
   'joy-stars': JoyStarsGame,
-  'support-rain': SupportRainGame,
+  'support-rain': ValleDeLasNubesGame,
+  'valle-nubes': ValleDeLasNubesGame,
   'volcano-control': VolcanoControlGame,
   'darkness-light': DarknessLightGame,
   'spirit-cleaning': SpiritCleaningGame,
