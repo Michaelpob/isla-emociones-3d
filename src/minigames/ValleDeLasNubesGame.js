@@ -404,34 +404,177 @@ export class ValleDeLasNubesGame {
     render();
   }
 
-  // 6.4 Solución — 4 pasos rápidos con juego final
+  // 6.4 Solución — 4 pasos interactivos para atravesar
   gameSolucion(){
-    let step=0, elegida='';
-    const alts=['Hablar con alguien de confianza','Revisar qué mejorar la próxima vez'];
-    const render=()=>{
+    let step = 0;
+    let elegida = '';
+    let elegidaIcon = '';
+    const alts = [
+      { t:'Hablar con alguien de confianza', icon:'💬', ok:true },
+      { t:'Revisar qué mejorar la próxima vez', icon:'📝', ok:true },
+      { t:'Buscar una nueva oportunidad', icon:'🔍', ok:true },
+      { t:'Culparme todo el día', icon:'😞', ok:false }
+    ];
+    const render = ()=>{
       if(step===0){
-        this.shell.innerHTML=`<p class="eyebrow">Encuentra una salida (1/4)</p><h2>IDENTIFICAR EL PROBLEMA</h2><button class="vn-choice" data-v>Perdí una oportunidad importante</button>`;
-        this.shell.querySelector('[data-v]').addEventListener('click', ()=>{step=1;render();});
-      } else if(step===1){
-        this.shell.innerHTML=`<p class="eyebrow">2/4 · GENERAR ALTERNATIVAS</p><h2>Toca 2 ideas</h2>${alts.map((t,i)=>`<button class="vn-choice" data-i="${i}">${t}</button>`).join('')}<button class="vn-choice" style="opacity:0.5" data-i="2">Culparme todo el día</button><div class="vn-actions"><button class="primary-action" data-next disabled>Continuar</button></div>`;
-        const chosen=new Set(); this.shell.querySelectorAll('[data-i]').forEach(b=>b.addEventListener('click',()=>{
-          const idx=Number(b.dataset.i); if(idx===2){b.style.borderColor='#e76856';return;} if(chosen.has(idx)){chosen.delete(idx);b.classList.remove('correct')} else if(chosen.size<2){chosen.add(idx);b.classList.add('correct')}
-          this.shell.querySelector('[data-next]').disabled=chosen.size!==2;
+        // 1. IDENTIFICAR — juego de encontrar el problema en la escena
+        this.shell.innerHTML=`
+          <p class="eyebrow">Solución 1/4 — IDENTIFICAR EL PROBLEMA</p>
+          <h2>¿Qué está generando la dificultad?</h2>
+          <p style="font-size:0.85rem;opacity:0.7">Toca el problema real en la escena. Atraviesa para continuar.</p>
+          <div class="vn-gamezone" data-zone style="height:220px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;place-items:center">
+            <button class="char" data-ok="true" style="font-size:16px;flex-direction:column">📅<span style="font-size:0.7rem;margin-top:4px">Plan cancelado</span></button>
+            <button class="char" data-ok="false" style="font-size:16px;flex-direction:column">👋<span style="font-size:0.7rem;margin-top:4px">No saludaron</span></button>
+            <button class="char" data-ok="false" style="font-size:16px;flex-direction:column">🌧️<span style="font-size:0.7rem;margin-top:4px">Llueve</span></button>
+          </div>
+          <p style="font-size:0.8rem;opacity:0.6">Pista: perdiste una oportunidad importante.</p>
+        `;
+        this.shell.querySelectorAll('[data-ok]').forEach(b=>b.addEventListener('click',()=>{
+          const ok=b.dataset.ok==='true';
+          if(ok){ b.classList.add('correct'); setTimeout(()=>{ step=1; render(); }, 400); }
+          else { b.classList.add('wrong'); setTimeout(()=>{ b.classList.remove('wrong'); }, 500); }
         }));
-        this.shell.querySelector('[data-next]').addEventListener('click', ()=>{if(chosen.size===2){step=2;render();}});
+      } else if(step===1){
+        // 2. GENERAR — atrapa 2 ideas válidas que caen
+        this.shell.innerHTML=`
+          <p class="eyebrow">Solución 2/4 — GENERAR ALTERNATIVAS</p>
+          <h2>Atrapa 2 ideas que sí ayudan</h2>
+          <p style="font-size:0.85rem;opacity:0.7">Toca 2 alternativas útiles. Evita la que no ayuda.</p>
+          <div class="vn-gamezone" data-zone style="height:240px;position:relative;overflow:hidden"></div>
+          <p style="font-size:0.85rem">Ideas: <strong data-count>0</strong>/2</p>
+        `;
+        const zone=this.shell.querySelector('[data-zone]');
+        const countEl=this.shell.querySelector('[data-count]');
+        let collected=[];
+        let running=true;
+        const spawn=()=>{
+          if(!running) return;
+          const item=alts[Math.floor(Math.random()*alts.length)];
+          const el=document.createElement('button');
+          el.className='falling';
+          el.innerHTML=`<span style="font-size:20px">${item.icon}</span><span style="font-size:0.6rem;display:block">${item.t.split(' ')[0]}</span>`;
+          el.title=item.t;
+          el.dataset.ok=String(item.ok);
+          el.dataset.text=item.t;
+          el.dataset.icon=item.icon;
+          el.style.left=`${5+Math.random()*75}%`;
+          el.style.top='-40px';
+          el.style.width='78px';
+          el.style.height='52px';
+          zone.appendChild(el);
+          let y=-40, speed=1.0+Math.random()*0.7;
+          const iv=setInterval(()=>{
+            if(!running||!el.isConnected){clearInterval(iv);return;}
+            y+=speed; el.style.top=`${y}px`;
+            if(y>250){clearInterval(iv); el.remove();}
+          },16);
+          el.addEventListener('click',()=>{
+            clearInterval(iv);
+            if(el.dataset.ok==='true'){
+              if(collected.length<2 && !collected.find(c=>c.t===el.dataset.text)){
+                collected.push({t:el.dataset.text, icon:el.dataset.icon});
+                countEl.textContent=String(collected.length);
+                el.style.borderColor='#72c264'; el.style.transform='scale(1.1)'; el.style.opacity='0';
+                setTimeout(()=>el.remove(),200);
+                if(collected.length===2){
+                  running=false;
+                  setTimeout(()=>{
+                    this._solucionCollected = collected;
+                    step=2; render();
+                  }, 400);
+                }
+              } else {
+                el.style.borderColor='#e76856'; setTimeout(()=>el.remove(),300);
+              }
+            } else {
+              el.style.borderColor='#e76856'; el.style.background='rgba(231,104,86,0.15)';
+              const tip=document.createElement('div'); tip.textContent='No ayuda'; tip.style.cssText='position:absolute;left:50%;top:-10px;transform:translateX(-50%);font-size:0.55rem;font-weight:800;color:#b92d32;background:#fff;padding:2px 6px;border-radius:10px';
+              el.appendChild(tip); setTimeout(()=>el.remove(),600);
+            }
+          });
+        };
+        const spawner=setInterval(spawn, 550);
+        // auto clear after 15s if not collected
+        setTimeout(()=>{ if(running && collected.length<2){ clearInterval(spawner); running=false; this.shell.innerHTML+=`<p style="color:#b92d32;font-weight:800">Te faltaron ideas. Intenta de nuevo.</p><div class="vn-actions"><button class="primary-action" data-retry>🔄 Reintentar</button></div>`; this.shell.querySelector('[data-retry]').addEventListener('click',()=>{step=1; render();}); } }, 16000);
+        spawn();
       } else if(step===2){
-        this.shell.innerHTML=`<p class="eyebrow">3/4 · ELEGIR</p><h2>Elige una</h2>${alts.map((t,i)=>`<button class="vn-choice" data-i="${i}">${t}</button>`).join('')}`;
-        this.shell.querySelectorAll('[data-i]').forEach(b=>b.addEventListener('click',()=>{elegida=b.textContent;step=3;render();}));
+        // 3. ELEGIR — elige 1 de las 2 generadas
+        const opts=this._solucionCollected || alts.filter(a=>a.ok).slice(0,2);
+        this.shell.innerHTML=`
+          <p class="eyebrow">Solución 3/4 — ELEGIR UNA ALTERNATIVA</p>
+          <h2>¿Cuál puedes hacer ahora?</h2>
+          <p style="font-size:0.85rem;opacity:0.7">Toca la que sea posible y adecuada para ti.</p>
+          <div class="vn-grid" style="grid-template-columns:1fr 1fr;gap:12px">
+            ${opts.map(o=>`<button class="char" data-choose="${o.t}" data-icon="${o.icon}" style="height:120px;flex-direction:column;font-size:28px">${o.icon}<span style="font-size:0.75rem;margin-top:6px;font-weight:800">${o.t}</span></button>`).join('')}
+          </div>
+        `;
+        this.shell.querySelectorAll('[data-choose]').forEach(b=>b.addEventListener('click',()=>{
+          elegida=b.dataset.choose;
+          elegidaIcon=b.dataset.icon;
+          b.classList.add('correct');
+          setTimeout(()=>{ step=3; render(); }, 350);
+        }));
       } else {
-        this.shell.innerHTML=`<p class="eyebrow">4/4 · ACTUAR</p><h2>${elegida}</h2><p>Toca para actuar.</p><div class="vn-gamezone" data-act style="display:grid;place-items:center;font-size:48px;cursor:pointer">🌱</div>`;
-        this.shell.querySelector('[data-act]').addEventListener('click',()=>{
-          this.addTool('Herramienta de acción');
-          this.shell.innerHTML=`<h2>¡Acción realizada!</h2><p>Cuando existe algo que podemos modificar, identificar alternativas y actuar puede ayudarnos a afrontar la situación.</p><p><span class="vn-badge">+ Herramienta de acción</span></p>${this.inventoryHTML()}<div class="vn-actions"><button class="primary-action" data-next>Continuar</button></div>`;
-          this.shell.querySelector('[data-next]').addEventListener('click', ()=>this.showIntensity(true));
-        });
+        // 4. ACTUAR — mini-juego de atravesar: repara el puente / habla
+        const isHablar = elegida.includes('Hablar');
+        this.shell.innerHTML=`
+          <p class="eyebrow">Solución 4/4 — ACTUAR</p>
+          <h2>${elegidaIcon} ${elegida}</h2>
+          <p style="font-size:0.85rem;opacity:0.7">${isHablar?'Arrastra el mensaje hasta la persona para actuar.':'Construye el nuevo camino tocando los ladrillos.'}</p>
+          <div class="vn-gamezone" data-act style="height:230px;display:grid;place-items:center;position:relative;overflow:hidden;background:linear-gradient(180deg, #eef6fb 0%, #d6ecf5 100%)">
+            ${isHablar?`
+              <div style="position:absolute;left:12%;top:50%;transform:translateY(-50%);font-size:42px" data-target>🧑‍🤝‍🧑</div>
+              <button data-drag style="position:absolute;left:60%;top:50%;transform:translateY(-50%);padding:10px 14px;border-radius:20px;background:#fff;border:2px solid #3178a8;font-weight:800;cursor:grab;box-shadow:0 8px 18px rgba(16,44,54,0.15)">💬 Hola, ¿podemos hablar?</button>
+              <div data-track style="position:absolute;left:18%;right:18%;top:50%;height:2px;background:repeating-linear-gradient(90deg, #3178a8 0 8px, transparent 8px 12px);opacity:0.35"></div>
+            `:`
+              <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;width:90%">
+                ${[0,1,2,3,4].map(i=>`<button data-brick="${i}" style="height:44px;border-radius:8px;background:#fff;border:2px dashed #8d5a3b;font-size:20px;cursor:pointer">🧱</button>`).join('')}
+              </div>
+              <p style="position:absolute;bottom:10px;font-size:0.75rem;opacity:0.6" data-progress>0/5 ladrillos</p>
+            `}
+          </div>
+        `;
+        if(isHablar){
+          const drag=this.shell.querySelector('[data-drag]');
+          const target=this.shell.querySelector('[data-target]');
+          let dragging=false, startX=0, curX=0;
+          const rect0=()=>this.shell.querySelector('[data-act]').getBoundingClientRect();
+          drag.addEventListener('pointerdown', e=>{ dragging=true; startX=e.clientX-curX; drag.setPointerCapture(e.pointerId); });
+          drag.addEventListener('pointermove', e=>{
+            if(!dragging) return;
+            curX=e.clientX-startX;
+            const maxLeft = rect0().width*0.45;
+            const minLeft = -rect0().width*0.25;
+            curX=Math.max(minLeft, Math.min(maxLeft, curX));
+            drag.style.transform=`translateY(-50%) translateX(${curX}px)`;
+            const tRect=target.getBoundingClientRect(), dRect=drag.getBoundingClientRect();
+            if(Math.abs(tRect.left - dRect.left) < 40){
+              dragging=false;
+              this.finishSolucion();
+            }
+          });
+          drag.addEventListener('pointerup', ()=>{ dragging=false; });
+        } else {
+          let built=0;
+          const prog=this.shell.querySelector('[data-progress]');
+          this.shell.querySelectorAll('[data-brick]').forEach(b=>{
+            b.addEventListener('click', ()=>{
+              if(b.dataset.done==='true') return;
+              b.dataset.done='true'; b.style.background='#72c264'; b.style.borderColor='#4a8a3a'; b.style.borderStyle='solid'; b.textContent='✅';
+              built++; prog.textContent=`${built}/5 ladrillos`;
+              if(built>=5) this.finishSolucion();
+            });
+          });
+        }
       }
     };
     render();
+  }
+
+  finishSolucion(){
+    this.addTool('Herramienta de acción');
+    this.shell.innerHTML=`<h2>¡Acción realizada!</h2><p>Cuando existe algo que podemos modificar, identificar alternativas y actuar puede ayudarnos a afrontar la situación.</p><p>Atravesaste el obstáculo del valle.</p><p><span class="vn-badge">+ Herramienta de acción</span></p>${this.inventoryHTML()}<div class="vn-actions"><button class="primary-action" data-next>Continuar →</button></div>`;
+    this.shell.querySelector('[data-next]').addEventListener('click', ()=>this.showIntensity(true));
   }
 
   // 6.5 Apoyo — toca persona
