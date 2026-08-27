@@ -157,20 +157,35 @@ export class ValleDeLasNubesGame {
     const countEl = this.shell.querySelector('[data-count]');
     const timeEl = this.shell.querySelector('[data-time]');
     let collected = 0, t=20, running=true;
-    const sadIcons = ['😢','🧍','🚪','🍽️','😮‍💨','👀'];
-    const badIcons = ['😂','⚡'];
+    // Manifestaciones claras de tristeza vs distractores
+    const goodItems = [
+      { icon:'😢', label:'Lágrimas' },
+      { icon:'😔', label:'Mirada baja' },
+      { icon:'🚪', label:'Aislamiento' },
+      { icon:'🍽️', label:'Sin apetito' },
+      { icon:'😮‍💨', label:'Suspiros' },
+      { icon:'🧍', label:'Postura baja' }
+    ];
+    const badItems = [
+      { icon:'😂', label:'Risa' },
+      { icon:'⚡', label:'Energía' }
+    ];
     const spawn = ()=>{
       if(!running) return;
-      const isGood = Math.random()<0.75;
-      const icon = isGood ? sadIcons[Math.floor(Math.random()*sadIcons.length)] : badIcons[Math.floor(Math.random()*badIcons.length)];
+      const isGood = Math.random()<0.72;
+      const item = isGood ? goodItems[Math.floor(Math.random()*goodItems.length)] : badItems[Math.floor(Math.random()*badItems.length)];
       const el = document.createElement('button');
       el.className = `falling ${isGood?'good':'bad'}`;
-      el.textContent = icon;
+      el.innerHTML = `<span style="font-size:18px">${item.icon}</span><span style="font-size:0.55rem;font-weight:700;display:block;line-height:1">${item.label}</span>`;
+      el.title = item.label;
       el.dataset.good = String(isGood);
-      el.style.left = `${5+Math.random()*80}%`;
+      el.style.left = `${5+Math.random()*78}%`;
       el.style.top = `-40px`;
+      el.style.width = '56px';
+      el.style.height = '48px';
+      el.style.flexDirection = 'column';
       zone.appendChild(el);
-      let y = -40, speed = 1.2 + Math.random()*1.2;
+      let y = -40, speed = 1.0 + Math.random()*1.0;
       const iv = setInterval(()=>{
         if(!running || !el.isConnected){ clearInterval(iv); return; }
         y += speed;
@@ -179,8 +194,24 @@ export class ValleDeLasNubesGame {
       }, 16);
       el.addEventListener('click', ()=>{
         clearInterval(iv);
-        if(el.dataset.good==='true'){ collected++; countEl.textContent=String(collected); el.style.transform='scale(1.3)'; el.style.opacity='0'; setTimeout(()=>el.remove(),180); if(collected>=6){ win(); } }
-        else { el.style.borderColor='#e76856'; setTimeout(()=>el.remove(),200); }
+        if(el.dataset.good==='true'){
+          collected++; countEl.textContent=String(collected);
+          el.style.transform='scale(1.25)';
+          el.style.opacity='0';
+          el.style.borderColor='#72c264';
+          setTimeout(()=>el.remove(),180);
+          if(collected>=6){ win(); }
+        } else {
+          // No cuenta, no avanza, feedback claro
+          el.style.borderColor='#e76856';
+          el.style.background='rgba(231,104,86,0.18)';
+          el.style.transform='scale(0.85)';
+          const tip = document.createElement('div');
+          tip.textContent='No es tristeza';
+          tip.style.cssText='position:absolute;left:50%;top:-14px;transform:translateX(-50%);font-size:0.6rem;font-weight:800;color:#b92d32;background:rgba(255,255,255,0.9);padding:2px 6px;border-radius:10px;white-space:nowrap';
+          el.appendChild(tip);
+          setTimeout(()=>el.remove(),600);
+        }
       });
     };
     const spawner = setInterval(spawn, 450);
