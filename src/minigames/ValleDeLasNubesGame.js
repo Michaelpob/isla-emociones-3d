@@ -93,7 +93,8 @@ export class ValleDeLasNubesGame {
     this.shell.innerHTML=`
       ${this.stepsBar(0)}
       <h1>BIENVENIDO AL VALLE DE LAS NUBES</h1>
-      <div class="vn-actions"><button class="primary-action" data-go>COMENZAR</button></div>
+      <p>Este es tu espacio. Aquí vas a reconocer lo que sientes y encontrar herramientas que <strong>te ayuden a ti</strong> a sentirte mejor.</p>
+      <div class="vn-actions"><button class="primary-action" data-go>COMENZAR TU RECORRIDO</button></div>
     `;
     this.shell.querySelector('[data-go]').addEventListener('click',()=>{
       this.intensidad_inicial = 'media';
@@ -230,7 +231,7 @@ export class ValleDeLasNubesGame {
       ${this.stepsBar(2)}
       <h2>2. GENERAR ALTERNATIVAS</h2>
       <p>Pensar diferentes formas de afrontar la situación.</p>
-      <p style="font-size:0.85rem;opacity:0.7">Mueve al personaje 3D y recoge 2 alternativas útiles.</p>
+      <p style="font-size:0.85rem;opacity:0.7">Ahora es tu turno: ayuda a tu personaje a encontrar 2 ideas que <strong>te ayuden a ti</strong> a sentirte mejor.</p>
       <div class="vn-gamezone" data-zone style="height:300px;position:relative;overflow:hidden;background:linear-gradient(180deg, #cfe9f5 0%, #a9d4e8 45%, #8ec0a8 100%);perspective:700px;transform-style:preserve-3d">
         <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 85%, rgba(255,255,255,0.85) 0%, transparent 55%);pointer-events:none"></div>
         <div style="position:absolute;left:0;right:0;bottom:0;height:38%;background:linear-gradient(180deg, #b8d8b8 0%, #8fb58f 100%);transform:rotateX(62deg);transform-origin:bottom;opacity:0.9;pointer-events:none;box-shadow:inset 0 12px 24px rgba(0,0,0,0.08)"></div>
@@ -299,6 +300,7 @@ export class ValleDeLasNubesGame {
       ${this.stepsBar(3)}
       <h2>3. ELEGIR UNA ALTERNATIVA</h2>
       <p>Seleccionar una opción posible y adecuada.</p>
+      <p style="font-size:0.85rem;opacity:0.7">Piensa en ti: ¿cuál de estas ideas <strong>puedes hacer tú</strong> ahora mismo?</p>
       <div class="vn-grid" style="grid-template-columns:1fr 1fr;gap:12px">
         ${opts.map(o=>`<button class="char" data-id="${o.id}" style="height:120px;flex-direction:column;font-size:28px">${o.icon}<span style="font-size:0.75rem;margin-top:6px;font-weight:800">${o.n}</span></button>`).join('')}
       </div>
@@ -320,19 +322,20 @@ export class ValleDeLasNubesGame {
       ${this.stepsBar(4)}
       <h2>4. ACTUAR</h2>
       <p>Poner en práctica la alternativa seleccionada mediante una interacción dentro del escenario.</p>
+      <p style="font-size:0.85rem;opacity:0.7">Ahora es tu momento: pon en práctica lo que elegiste para <strong>sentirte mejor tú</strong>.</p>
       <div class="vn-gamezone" data-zone style="height:260px"></div>
     `;
     const zone=this.shell.querySelector('[data-zone]');
     if(id==='reevaluacion'){
       const opts=[{t:'Todo siempre me sale mal.',ok:false},{t:'Es difícil, pero los planes cambian. Puedo ver qué hacer ahora.',ok:true},{t:'No me importa.',ok:false}];
-      zone.innerHTML=`<p style="font-weight:800">Toca la idea equilibrada para atravesar</p>${opts.map((o,i)=>`<button class="vn-choice" data-i="${i}">💭 ${o.t}</button>`).join('')}`;
+      zone.innerHTML=`<p style="font-weight:800">Elige el pensamiento que <strong>te ayude a ti</strong> a sentirte mejor</p>${opts.map((o,i)=>`<button class="vn-choice" data-i="${i}">💭 ${o.t}</button>`).join('')}`;
       zone.querySelectorAll('[data-i]').forEach(b=>b.addEventListener('click',()=>{
         const ok=opts[Number(b.dataset.i)].ok; b.classList.add(ok?'correct':'wrong');
         if(ok){ this.caja.add('Cristal de perspectiva'); setTimeout(()=>this.finalActuar(),350); }
         else { setTimeout(()=>{ b.classList.remove('wrong'); },500); }
       }));
     } else if(id==='atencional'){
-      zone.innerHTML=`<p style="font-weight:800">Toca la estrella 5 veces para dirigir tu atención</p><div data-z style="position:relative;height:180px"></div><p style="font-size:0.85rem">Progreso: <strong data-p>0</strong>/5</p>`;
+      zone.innerHTML=`<p style="font-weight:800">Toca la estrella 5 veces para que <strong>tú</strong> puedas enfocar tu atención</p><div data-z style="position:relative;height:180px"></div><p style="font-size:0.85rem">Progreso para ti: <strong data-p>0</strong>/5</p>`;
       const z=zone.querySelector('[data-z]'); const pEl=zone.querySelector('[data-p]'); let c=0; let star=null;
       const place=()=>{
         if(star) star.remove(); star=document.createElement('button'); star.className='star'; star.textContent='⭐'; star.style.left=`${8+Math.random()*78}%`; star.style.top=`${8+Math.random()*60}%`;
@@ -421,9 +424,9 @@ export class ValleDeLasNubesGame {
   finalActuar(){
     this.shell.innerHTML=`
       ${this.stepsBar(4)}
-      <h2>¡Acción realizada!</h2>
-      <p>Cuando existe algo que podemos modificar, identificar alternativas y actuar puede ayudarnos a afrontar la situación.</p>
-      <p style="font-size:0.85rem;opacity:0.7">Ahora atraviesa la nube final.</p>
+      <h2>¡Lo hiciste tú!</h2>
+      <p>Cuando existe algo que <strong>puedes</strong> modificar, identificar alternativas y actuar puede <strong>ayudarte a ti</strong> a afrontar lo que sientes.</p>
+      <p style="font-size:0.85rem;opacity:0.7">Ahora tú puedes atravesar la nube final y continuar tu camino.</p>
       ${this.inventory()}
       <div class="vn-actions"><button class="primary-action" data-next>Atravesar la nube →</button></div>
     `;
