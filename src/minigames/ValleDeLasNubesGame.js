@@ -149,12 +149,12 @@ export class ValleDeLasNubesGame {
       <h2>Atrapa las señales de tristeza</h2>
       <p style="font-size:0.85rem;opacity:0.7">La tristeza puede manifestarse de diferentes maneras. Atrapa 6. Evita las que no son.</p>
       <div class="vn-gamezone" data-zone style="height:260px"></div>
-      <p style="font-size:0.85rem">Progreso: <strong data-count>0</strong>/6 · Tiempo: <strong data-time>12</strong>s</p>
+      <p style="font-size:0.85rem">Progreso: <strong data-count>0</strong>/6 · Tiempo: <strong data-time>20</strong>s</p>
     `;
     const zone = this.shell.querySelector('[data-zone]');
     const countEl = this.shell.querySelector('[data-count]');
     const timeEl = this.shell.querySelector('[data-time]');
-    let collected = 0, t=12, running=true;
+    let collected = 0, t=20, running=true;
     const sadIcons = ['😢','🧍','🚪','🍽️','😮‍💨','👀'];
     const badIcons = ['😂','⚡'];
     const spawn = ()=>{
