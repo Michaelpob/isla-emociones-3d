@@ -417,17 +417,16 @@ export class ValleDeLasNubesGame {
     ];
     const render = ()=>{
       if(step===0){
-        // 1. IDENTIFICAR — juego de encontrar el problema en la escena
+        // 1. IDENTIFICAR EL PROBLEMA — al pie de la letra
         this.shell.innerHTML=`
-          <p class="eyebrow">Solución 1/4 — IDENTIFICAR EL PROBLEMA</p>
-          <h2>¿Qué está generando la dificultad?</h2>
-          <p style="font-size:0.85rem;opacity:0.7">Toca el problema real en la escena. Atraviesa para continuar.</p>
+          <p class="eyebrow">Solución 1/4</p>
+          <h2>1. IDENTIFICAR EL PROBLEMA</h2>
+          <p>Reconocer qué está generando la dificultad.</p>
           <div class="vn-gamezone" data-zone style="height:220px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;place-items:center">
             <button class="char" data-ok="true" style="font-size:16px;flex-direction:column">📅<span style="font-size:0.7rem;margin-top:4px">Plan cancelado</span></button>
             <button class="char" data-ok="false" style="font-size:16px;flex-direction:column">👋<span style="font-size:0.7rem;margin-top:4px">No saludaron</span></button>
             <button class="char" data-ok="false" style="font-size:16px;flex-direction:column">🌧️<span style="font-size:0.7rem;margin-top:4px">Llueve</span></button>
           </div>
-          <p style="font-size:0.8rem;opacity:0.6">Pista: perdiste una oportunidad importante.</p>
         `;
         this.shell.querySelectorAll('[data-ok]').forEach(b=>b.addEventListener('click',()=>{
           const ok=b.dataset.ok==='true';
@@ -435,11 +434,11 @@ export class ValleDeLasNubesGame {
           else { b.classList.add('wrong'); setTimeout(()=>{ b.classList.remove('wrong'); }, 500); }
         }));
       } else if(step===1){
-        // 2. GENERAR — atrapa 2 ideas válidas que caen
+        // 2. GENERAR ALTERNATIVAS — al pie de la letra
         this.shell.innerHTML=`
-          <p class="eyebrow">Solución 2/4 — GENERAR ALTERNATIVAS</p>
-          <h2>Atrapa 2 ideas que sí ayudan</h2>
-          <p style="font-size:0.85rem;opacity:0.7">Toca 2 alternativas útiles. Evita la que no ayuda.</p>
+          <p class="eyebrow">Solución 2/4</p>
+          <h2>2. GENERAR ALTERNATIVAS</h2>
+          <p>Pensar diferentes formas de afrontar la situación.</p>
           <div class="vn-gamezone" data-zone style="height:240px;position:relative;overflow:hidden"></div>
           <p style="font-size:0.85rem">Ideas: <strong data-count>0</strong>/2</p>
         `;
@@ -498,12 +497,12 @@ export class ValleDeLasNubesGame {
         setTimeout(()=>{ if(running && collected.length<2){ clearInterval(spawner); running=false; this.shell.innerHTML+=`<p style="color:#b92d32;font-weight:800">Te faltaron ideas. Intenta de nuevo.</p><div class="vn-actions"><button class="primary-action" data-retry>🔄 Reintentar</button></div>`; this.shell.querySelector('[data-retry]').addEventListener('click',()=>{step=1; render();}); } }, 16000);
         spawn();
       } else if(step===2){
-        // 3. ELEGIR — elige 1 de las 2 generadas
+        // 3. ELEGIR UNA ALTERNATIVA — al pie de la letra
         const opts=this._solucionCollected || alts.filter(a=>a.ok).slice(0,2);
         this.shell.innerHTML=`
-          <p class="eyebrow">Solución 3/4 — ELEGIR UNA ALTERNATIVA</p>
-          <h2>¿Cuál puedes hacer ahora?</h2>
-          <p style="font-size:0.85rem;opacity:0.7">Toca la que sea posible y adecuada para ti.</p>
+          <p class="eyebrow">Solución 3/4</p>
+          <h2>3. ELEGIR UNA ALTERNATIVA</h2>
+          <p>Seleccionar una opción posible y adecuada.</p>
           <div class="vn-grid" style="grid-template-columns:1fr 1fr;gap:12px">
             ${opts.map(o=>`<button class="char" data-choose="${o.t}" data-icon="${o.icon}" style="height:120px;flex-direction:column;font-size:28px">${o.icon}<span style="font-size:0.75rem;margin-top:6px;font-weight:800">${o.t}</span></button>`).join('')}
           </div>
@@ -515,19 +514,20 @@ export class ValleDeLasNubesGame {
           setTimeout(()=>{ step=3; render(); }, 350);
         }));
       } else {
-        // 4. ACTUAR — mini-juego de atravesar: repara el puente / habla
+        // 4. ACTUAR — al pie de la letra
         const isHablar = elegida.includes('Hablar');
         this.shell.innerHTML=`
-          <p class="eyebrow">Solución 4/4 — ACTUAR</p>
-          <h2>${elegidaIcon} ${elegida}</h2>
-          <p style="font-size:0.85rem;opacity:0.7">${isHablar?'Arrastra el mensaje hasta la persona para actuar.':'Construye el nuevo camino tocando los ladrillos.'}</p>
+          <p class="eyebrow">Solución 4/4</p>
+          <h2>4. ACTUAR</h2>
+          <p>Poner en práctica la alternativa seleccionada mediante una interacción dentro del escenario.</p>
           <div class="vn-gamezone" data-act style="height:230px;display:grid;place-items:center;position:relative;overflow:hidden;background:linear-gradient(180deg, #eef6fb 0%, #d6ecf5 100%)">
+            <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:0.75rem;font-weight:800;background:rgba(255,255,255,0.9);padding:4px 8px;border-radius:20px">${elegidaIcon} ${elegida}</div>
             ${isHablar?`
-              <div style="position:absolute;left:12%;top:50%;transform:translateY(-50%);font-size:42px" data-target>🧑‍🤝‍🧑</div>
-              <button data-drag style="position:absolute;left:60%;top:50%;transform:translateY(-50%);padding:10px 14px;border-radius:20px;background:#fff;border:2px solid #3178a8;font-weight:800;cursor:grab;box-shadow:0 8px 18px rgba(16,44,54,0.15)">💬 Hola, ¿podemos hablar?</button>
-              <div data-track style="position:absolute;left:18%;right:18%;top:50%;height:2px;background:repeating-linear-gradient(90deg, #3178a8 0 8px, transparent 8px 12px);opacity:0.35"></div>
+              <div style="position:absolute;left:12%;top:58%;transform:translateY(-50%);font-size:42px" data-target>🧑‍🤝‍🧑</div>
+              <button data-drag style="position:absolute;left:60%;top:58%;transform:translateY(-50%);padding:10px 14px;border-radius:20px;background:#fff;border:2px solid #3178a8;font-weight:800;cursor:grab;box-shadow:0 8px 18px rgba(16,44,54,0.15)">💬 Hola, ¿podemos hablar?</button>
+              <div data-track style="position:absolute;left:18%;right:18%;top:58%;height:2px;background:repeating-linear-gradient(90deg, #3178a8 0 8px, transparent 8px 12px);opacity:0.35"></div>
             `:`
-              <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;width:90%">
+              <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;width:90%;margin-top:18px">
                 ${[0,1,2,3,4].map(i=>`<button data-brick="${i}" style="height:44px;border-radius:8px;background:#fff;border:2px dashed #8d5a3b;font-size:20px;cursor:pointer">🧱</button>`).join('')}
               </div>
               <p style="position:absolute;bottom:10px;font-size:0.75rem;opacity:0.6" data-progress>0/5 ladrillos</p>
@@ -573,7 +573,7 @@ export class ValleDeLasNubesGame {
 
   finishSolucion(){
     this.addTool('Herramienta de acción');
-    this.shell.innerHTML=`<h2>¡Acción realizada!</h2><p>Cuando existe algo que podemos modificar, identificar alternativas y actuar puede ayudarnos a afrontar la situación.</p><p>Atravesaste el obstáculo del valle.</p><p><span class="vn-badge">+ Herramienta de acción</span></p>${this.inventoryHTML()}<div class="vn-actions"><button class="primary-action" data-next>Continuar →</button></div>`;
+    this.shell.innerHTML=`<h2>¡Acción realizada!</h2><p>Cuando existe algo que podemos modificar, identificar alternativas y actuar puede ayudarnos a afrontar la situación.</p><p><span class="vn-badge">+ Herramienta de acción</span></p>${this.inventoryHTML()}<div class="vn-actions"><button class="primary-action" data-next>Continuar →</button></div>`;
     this.shell.querySelector('[data-next]').addEventListener('click', ()=>this.showIntensity(true));
   }
 
