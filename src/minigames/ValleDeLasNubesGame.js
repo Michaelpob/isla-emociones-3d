@@ -96,11 +96,7 @@ export class ValleDeLasNubesGame {
       <p>Este es tu espacio. Aquí vas a reconocer lo que sientes y encontrar herramientas que <strong>te ayuden a ti</strong> a sentirte mejor.</p>
       <div class="vn-actions"><button class="primary-action" data-go>COMENZAR TU RECORRIDO</button></div>
     `;
-    this.shell.querySelector('[data-go]').addEventListener('click',()=>{
-      this.intensidad_inicial = 'media';
-      this.setAtmosphere('media');
-      this.paso2_generar();
-    });
+    this.shell.querySelector('[data-go]').addEventListener('click',()=>this.paso1_identificar());
   }
 
   // 1. IDENTIFICAR EL PROBLEMA — Reconocer qué está generando la dificultad.
@@ -326,48 +322,29 @@ export class ValleDeLasNubesGame {
       <div class="vn-gamezone" data-zone style="height:260px"></div>
     `;
     const zone=this.shell.querySelector('[data-zone]');
-    if(id==='reevaluacion'){
-      const opts=[{t:'Todo siempre me sale mal.',ok:false},{t:'Es difícil, pero los planes cambian. Puedo ver qué hacer ahora.',ok:true},{t:'No me importa.',ok:false}];
-      zone.innerHTML=`<p style="font-weight:800">Elige el pensamiento que <strong>te ayude a ti</strong> a sentirte mejor</p>${opts.map((o,i)=>`<button class="vn-choice" data-i="${i}">💭 ${o.t}</button>`).join('')}`;
-      zone.querySelectorAll('[data-i]').forEach(b=>b.addEventListener('click',()=>{
-        const ok=opts[Number(b.dataset.i)].ok; b.classList.add(ok?'correct':'wrong');
-        if(ok){ this.caja.add('Cristal de perspectiva'); setTimeout(()=>this.finalActuar(),350); }
-        else { setTimeout(()=>{ b.classList.remove('wrong'); },500); }
-      }));
-    } else if(id==='atencional'){
-      zone.innerHTML=`<p style="font-weight:800">Toca la estrella 5 veces para que <strong>tú</strong> puedas enfocar tu atención</p><div data-z style="position:relative;height:180px"></div><p style="font-size:0.85rem">Progreso para ti: <strong data-p>0</strong>/5</p>`;
-      const z=zone.querySelector('[data-z]'); const pEl=zone.querySelector('[data-p]'); let c=0; let star=null;
-      const place=()=>{
-        if(star) star.remove(); star=document.createElement('button'); star.className='star'; star.textContent='⭐'; star.style.left=`${8+Math.random()*78}%`; star.style.top=`${8+Math.random()*60}%`;
-        star.addEventListener('click',()=>{ c++; pEl.textContent=String(c); if(c>=5){ this.caja.add('Estrella de atención'); this.finalActuar(); } else place(); });
-        z.appendChild(star);
-      }; place();
-    } else if(id==='aceptacion'){
-      const pasos=[{t:'RECONOCER',d:'Estoy sintiendo tristeza.'},{t:'COMPRENDER',d:'Esta emoción apareció porque ocurrió algo importante para mí.'},{t:'ACEPTAR',d:'Puedo sentir tristeza sin juzgarme por sentirla.'}];
-      let i=0;
-      const render=()=>{
-        const s=pasos[i];
-        zone.innerHTML=`<p style="font-weight:800">${s.t} (${i+1}/3)</p><p style="font-size:1rem;font-weight:800;border-left:4px solid #3178a8;padding-left:10px">${s.d}</p><button class="primary-action" data-next>${i===2?'Completar':'Tocar para sentir'}</button>`;
-        zone.querySelector('[data-next]').addEventListener('click',()=>{ i++; if(i<pasos.length) render(); else { this.caja.add('Semilla de aceptación'); if(this.intensidad_inicial==='alta') this.setAtmosphere('media'); this.finalActuar(); }});
-      }; render();
-    } else if(id==='solucion'){
-      this.paso4_solucionDetallado(zone);
-      return;
-    } else if(id==='apoyo'){
-      zone.innerHTML=`<p style="font-weight:800">Toca a la persona de confianza</p><div class="vn-grid" style="grid-template-columns:repeat(3,1fr)"><button class="char" data-ok="false">🧑‍🏫</button><button class="char" data-ok="true">🧑‍🤝‍🧑</button><button class="char" data-ok="false">😐</button></div>`;
-      zone.querySelectorAll('.char').forEach(b=>b.addEventListener('click',()=>{
-        if(b.dataset.ok!=='true'){b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'),500); return;}
-        zone.innerHTML=`<p style="font-weight:800">¿Quieres contarme qué ocurrió?</p><button class="vn-choice" data-i="0">Me siento triste porque perdí algo importante y quiero hablar.</button><button class="vn-choice" data-i="1">No me pasa nada.</button>`;
-        zone.querySelectorAll('[data-i]').forEach(c=>c.addEventListener('click',()=>{
-          const ok=c.dataset.i==='0'; c.classList.add(ok?'correct':'wrong');
-          if(ok){ this.caja.add('Corazón de apoyo'); setTimeout(()=>this.finalActuar(),350); }
-          else setTimeout(()=>{c.classList.remove('wrong')},500);
-        }));
-      }));
-    } else {
-      zone.innerHTML=`<button class="primary-action" data-go>Actuar</button>`;
-      zone.querySelector('[data-go]').addEventListener('click',()=>this.finalActuar());
-    }
+    // Un solo mini-juego para ACTUAR: construye tu camino (vale para cualquier estrategia elegida)
+    const toolMap={ reevaluacion:'Cristal de perspectiva', atencional:'Estrella de atención', aceptacion:'Semilla de aceptación', solucion:'Herramienta de acción', apoyo:'Corazón de apoyo' };
+    const toolName=toolMap[id] || 'Herramienta de acción';
+    zone.innerHTML=`
+      <p style="font-weight:800">Construye tu camino para atravesar</p>
+      <p style="font-size:0.85rem;opacity:0.7">Toca los 5 tablones para construir el puente con tu estrategia: <strong>${toolName}</strong></p>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px">
+        ${[0,1,2,3,4].map(i=>`<button data-brick="${i}" style="height:52px;border-radius:10px;background:#fff;border:2px dashed #8d5a3b;font-size:22px;cursor:pointer;box-shadow:0 6px 12px rgba(0,0,0,0.08)">🪵</button>`).join('')}
+      </div>
+      <p style="font-size:0.8rem;opacity:0.6;margin-top:8px" data-progress>0/5 tablones</p>
+    `;
+    let built=0;
+    zone.querySelectorAll('[data-brick]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        if(btn.dataset.done==='true') return;
+        btn.dataset.done='true'; btn.textContent='✅'; btn.style.background='#72c264'; btn.style.borderColor='#4a8a3a'; btn.style.borderStyle='solid';
+        built++; zone.querySelector('[data-progress]').textContent=`${built}/5 tablones`;
+        if(built>=5){
+          this.caja.add(toolName);
+          setTimeout(()=>this.finalActuar(), 400);
+        }
+      });
+    });
   }
 
   // Solución detallada con 4 pasos internos pero ya estamos en ACTUAR, así que lo hacemos como sub-juego rápido
