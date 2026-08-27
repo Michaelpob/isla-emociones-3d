@@ -213,7 +213,7 @@ export class ValleDeLasNubesGame {
     });
   }
 
-  // 2. GENERAR ALTERNATIVAS — Pensar diferentes formas de afrontar la situación.
+  // 2. GENERAR ALTERNATIVAS — Personaje que se mueve y escoge
   paso2_generar(){
     const nivel=this.intensidad_inicial;
     const pool={
@@ -222,44 +222,72 @@ export class ValleDeLasNubesGame {
       alta:[{id:'aceptacion',n:'Aceptación',icon:'🌱',d:'Reconoce lo que sientes'},{id:'reevaluacion',n:'Reevaluación',icon:'💭',d:'Cambia la perspectiva'},{id:'apoyo',n:'Apoyo',icon:'💚',d:'No tienes que hacerlo solo'}]
     };
     const opts=pool[nivel]||pool.baja;
+    const distractors=[{n:'Ignorar',icon:'🙈',id:'distractor'}];
+    const all=[...opts, ...distractors];
+    // posiciones fijas para que el personaje camine
+    const positions=[{left:'12%',top:'22%'},{left:'68%',top:'18%'},{left:'35%',top:'52%'},{left:'72%',top:'55%'}];
     this.shell.innerHTML=`
       ${this.stepsBar(2)}
       <h2>2. GENERAR ALTERNATIVAS</h2>
       <p>Pensar diferentes formas de afrontar la situación.</p>
-      <p style="font-size:0.85rem;opacity:0.7">Atrapa 2 estrategias que podrías usar (intensidad ${nivel.toUpperCase()}).</p>
-      <div class="vn-gamezone" data-zone style="height:240px;position:relative;overflow:hidden"></div>
-      <p style="font-size:0.85rem">Generadas: <strong data-count>0</strong>/2</p>
+      <p style="font-size:0.85rem;opacity:0.7">Mueve al personaje y recoge 2 alternativas útiles. Evita la que no ayuda.</p>
+      <div class="vn-gamezone" data-zone style="height:280px;position:relative;overflow:hidden;background:linear-gradient(180deg, #eef6fb 0%, #d6ecf5 55%, #c8e8c8 100%)">
+        <div data-char style="position:absolute;left:50%;top:78%;transform:translateX(-50%);font-size:36px;transition:left 500ms ease, top 500ms ease, transform 200ms;z-index:5;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.2))">${this.player?.avatar ?? '🧍'}</div>
+        ${all.map((a,i)=>`
+          <button data-alt="${a.id}" data-ok="${a.id!=='distractor'}" style="position:absolute;left:${positions[i].left};top:${positions[i].top};width:84px;height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:12px;background:rgba(255,255,255,0.92);border:1px solid rgba(16,44,54,0.14);border-bottom:4px solid rgba(16,44,54,0.15);box-shadow:0 8px 16px rgba(16,44,54,0.12);cursor:pointer">
+            <span style="font-size:22px">${a.icon}</span><span style="font-size:0.6rem;font-weight:800">${a.n}</span>
+          </button>
+        `).join('')}
+      </div>
+      <p style="font-size:0.85rem">Recogidas: <strong data-count>0</strong>/2 · Toca una alternativa y el personaje caminará hacia ella</p>
     `;
     const zone=this.shell.querySelector('[data-zone]');
+    const char=this.shell.querySelector('[data-char]');
     const countEl=this.shell.querySelector('[data-count]');
     let collected=[];
-    let running=true;
-    const spawn=()=>{
-      if(!running) return;
-      const it=opts[Math.floor(Math.random()*opts.length)];
-      // ocasional distractor
-      const isDistractor=Math.random()<0.2;
-      const data=isDistractor?{n:'Ignorar',icon:'🙈',id:'distractor'}:it;
-      const el=document.createElement('button'); el.className='falling'; el.dataset.id=data.id; el.dataset.ok=String(!isDistractor);
-      el.innerHTML=`<span style="font-size:20px">${data.icon}</span><span style="font-size:0.6rem;display:block;font-weight:700">${data.n}</span>`;
-      el.style.left=`${5+Math.random()*75}%`; el.style.top='-40px'; el.style.width='76px'; el.style.height='52px';
-      zone.appendChild(el);
-      let y=-40, s=1.0+Math.random()*0.7;
-      const iv=setInterval(()=>{ if(!running||!el.isConnected){clearInterval(iv);return;} y+=s; el.style.top=y+'px'; if(y>250){clearInterval(iv);el.remove();}},16);
-      el.addEventListener('click',()=>{
-        clearInterval(iv);
-        if(el.dataset.ok==='true'){
-          if(!collected.find(c=>c.id===el.dataset.id)){
-            collected.push({id:el.dataset.id, n:data.n, icon:data.icon});
-            countEl.textContent=String(collected.length);
-            el.style.borderColor='#72c264'; el.style.opacity='0'; setTimeout(()=>el.remove(),180);
-            if(collected.length===2){ running=false; this._generadas=collected; setTimeout(()=>this.paso3_elegir(),400); }
-          } else { el.style.borderColor='#e76856'; setTimeout(()=>el.remove(),300); }
-        } else { el.style.borderColor='#e76856'; const tip=document.createElement('div'); tip.textContent='No ayuda'; tip.style.cssText='position:absolute;left:50%;top:-10px;transform:translateX(-50%);font-size:0.55rem;font-weight:800;color:#b92d32;background:#fff;padding:2px 6px;border-radius:10px'; el.appendChild(tip); setTimeout(()=>el.remove(),600); }
+    let moving=false;
+    this.shell.querySelectorAll('[data-alt]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        if(moving) return;
+        const rect=zone.getBoundingClientRect();
+        const bRect=btn.getBoundingClientRect();
+        const zRect=zone.getBoundingClientRect();
+        // mover personaje a la posición del botón
+        moving=true;
+        const targetLeft = ((bRect.left - zRect.left + bRect.width/2) / zRect.width * 100);
+        const targetTop = ((bRect.top - zRect.top + bRect.height/2 + 18) / zRect.height * 100);
+        char.style.left = targetLeft + '%';
+        char.style.top = targetTop + '%';
+        char.style.transform = 'translateX(-50%) scale(1.08)';
+        setTimeout(()=>{
+          char.style.transform = 'translateX(-50%) scale(1)';
+          const ok=btn.dataset.ok==='true';
+          const id=btn.dataset.alt;
+          if(ok){
+            if(!collected.find(c=>c.id===id)){
+              const data=all.find(a=>a.id===id);
+              collected.push({id:data.id, n:data.n, icon:data.icon});
+              countEl.textContent=String(collected.length);
+              btn.style.borderColor='#72c264'; btn.style.background='rgba(114,194,100,0.18)'; btn.style.opacity='0.45'; btn.disabled=true;
+              // efecto recoger
+              const puff=document.createElement('div'); puff.textContent='✓'; puff.style.cssText='position:absolute;left:50%;top:-10px;transform:translateX(-50%);background:#72c264;color:#fff;font-weight:900;padding:2px 6px;border-radius:10px;font-size:0.7rem';
+              btn.appendChild(puff);
+              if(collected.length===2){
+                setTimeout(()=>{ this._generadas=collected; this.paso3_elegir(); }, 500);
+                return;
+              }
+            } else {
+              btn.style.borderColor='#e76856';
+            }
+          } else {
+            btn.style.borderColor='#e76856'; btn.style.background='rgba(231,104,86,0.15)';
+            const tip=document.createElement('div'); tip.textContent='No ayuda'; tip.style.cssText='position:absolute;left:50%;top:-14px;transform:translateX(-50%);font-size:0.55rem;font-weight:800;color:#b92d32;background:#fff;padding:2px 6px;border-radius:10px;white-space:nowrap';
+            btn.appendChild(tip); setTimeout(()=>{ tip.remove(); btn.style.borderColor='rgba(16,44,54,0.14)'; btn.style.background='rgba(255,255,255,0.92)'; }, 800);
+          }
+          moving=false;
+        }, 520);
       });
-    };
-    const spawner=setInterval(spawn,520);
-    setTimeout(()=>spawn(),100);
+    });
   }
 
   // 3. ELEGIR UNA ALTERNATIVA — Seleccionar una opción posible y adecuada.
