@@ -4281,7 +4281,7 @@ void main() {
       </style>
       <div class="vn-cloud"></div><div class="vn-dark"></div>
       <div style="position:sticky;top:0;z-index:5;max-width:760px;width:min(92vw,760px);margin:10px auto 0;display:flex;justify-content:space-between;align-items:center">
-        <div class="eyebrow" style="margin:0">Valle de las Nubes · Tristeza</div>
+        <div class="eyebrow" style="margin:0">Valle de las Nubes · Tristeza · v-ebc57f4</div>
         <button class="icon-button" type="button" data-exit>✕</button>
       </div>
       <div class="vn-shell" data-shell></div>
