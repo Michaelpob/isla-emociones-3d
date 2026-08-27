@@ -1326,31 +1326,4 @@ p {
   }
 }
 
-.visit-counter {
-  position: fixed;
-  right: 10px;
-  bottom: 10px;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 12px;
-  border-radius: 20px;
-  background: rgba(16, 44, 54, 0.78);
-  color: #ffffff;
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
-  pointer-events: none;
-}
 
-@media (max-width: 720px) {
-  .visit-counter {
-    right: 8px;
-    bottom: 88px;
-    font-size: 0.72rem;
-    padding: 6px 10px;
-  }
-}
