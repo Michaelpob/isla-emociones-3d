@@ -167,9 +167,6 @@ export class EmotionIslandApp {
           <div class="progress-pill">${this.completed.size}/${islands.length} completadas</div>
         </div>
       </section>
-      <nav class="island-list" aria-label="Islas disponibles">
-        ${islands.map((island) => this.renderIslandButton(island)).join('')}
-      </nav>
       <div class="touch-controls" data-touch-controls>
         <div class="joystick-zone" data-joystick-zone>
           <div class="joystick-base" data-joystick-base>
@@ -189,10 +186,6 @@ export class EmotionIslandApp {
     }
 
     this.setupTouchControls();
-
-    this.overlayRoot.querySelectorAll('[data-island-id]').forEach((button) => {
-      button.addEventListener('click', () => this.selectIsland(button.dataset.islandId));
-    });
   }
 
   setupTouchControls() {
