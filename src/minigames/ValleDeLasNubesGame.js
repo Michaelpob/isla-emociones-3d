@@ -230,16 +230,18 @@ export class ValleDeLasNubesGame {
       ${this.stepsBar(2)}
       <h2>2. GENERAR ALTERNATIVAS</h2>
       <p>Pensar diferentes formas de afrontar la situación.</p>
-      <p style="font-size:0.85rem;opacity:0.7">Mueve al personaje y recoge 2 alternativas útiles. Evita la que no ayuda.</p>
-      <div class="vn-gamezone" data-zone style="height:280px;position:relative;overflow:hidden;background:linear-gradient(180deg, #eef6fb 0%, #d6ecf5 55%, #c8e8c8 100%)">
-        <div data-char style="position:absolute;left:50%;top:78%;transform:translateX(-50%);font-size:36px;transition:left 500ms ease, top 500ms ease, transform 200ms;z-index:5;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.2))">${this.player?.avatar ?? '🧍'}</div>
+      <p style="font-size:0.85rem;opacity:0.7">Mueve al personaje 3D y recoge 2 alternativas útiles.</p>
+      <div class="vn-gamezone" data-zone style="height:300px;position:relative;overflow:hidden;background:linear-gradient(180deg, #cfe9f5 0%, #a9d4e8 45%, #8ec0a8 100%);perspective:700px;transform-style:preserve-3d">
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 85%, rgba(255,255,255,0.85) 0%, transparent 55%);pointer-events:none"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:38%;background:linear-gradient(180deg, #b8d8b8 0%, #8fb58f 100%);transform:rotateX(62deg);transform-origin:bottom;opacity:0.9;pointer-events:none;box-shadow:inset 0 12px 24px rgba(0,0,0,0.08)"></div>
+        <div data-char style="position:absolute;left:50%;top:78%;transform:translateX(-50%) translateZ(18px) rotateX(-10deg);font-size:38px;transition:left 500ms ease, top 500ms ease, transform 200ms;z-index:5;filter:drop-shadow(0 10px 10px rgba(0,0,0,0.22));transform-style:preserve-3d">${this.player?.avatar ?? '🧍'}</div>
         ${all.map((a,i)=>`
-          <button data-alt="${a.id}" data-ok="${a.id!=='distractor'}" style="position:absolute;left:${positions[i].left};top:${positions[i].top};width:84px;height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:12px;background:rgba(255,255,255,0.92);border:1px solid rgba(16,44,54,0.14);border-bottom:4px solid rgba(16,44,54,0.15);box-shadow:0 8px 16px rgba(16,44,54,0.12);cursor:pointer">
-            <span style="font-size:22px">${a.icon}</span><span style="font-size:0.6rem;font-weight:800">${a.n}</span>
+          <button data-alt="${a.id}" data-ok="${a.id!=='distractor'}" style="position:absolute;left:${positions[i].left};top:${positions[i].top};width:86px;height:68px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:12px;background:linear-gradient(180deg, #ffffff 0%, #f3f8fb 100%);border:1px solid rgba(16,44,54,0.14);border-bottom:5px solid rgba(16,44,54,0.18);box-shadow:0 14px 20px rgba(16,44,54,0.16), 0 4px 8px rgba(16,44,54,0.1);cursor:pointer;transform:translateZ(14px) rotateX(6deg);transform-style:preserve-3d;transition:transform 160ms">
+            <span style="font-size:22px;transform:translateZ(6px)">${a.icon}</span><span style="font-size:0.6rem;font-weight:800;transform:translateZ(6px)">${a.n}</span>
           </button>
         `).join('')}
       </div>
-      <p style="font-size:0.85rem">Recogidas: <strong data-count>0</strong>/2 · Toca una alternativa y el personaje caminará hacia ella</p>
+      <p style="font-size:0.85rem">Recogidas: <strong data-count>0</strong>/2 · Toca una alternativa (vista 3D) y el personaje caminará hacia ella</p>
     `;
     const zone=this.shell.querySelector('[data-zone]');
     const char=this.shell.querySelector('[data-char]');
@@ -258,9 +260,9 @@ export class ValleDeLasNubesGame {
         const targetTop = ((bRect.top - zRect.top + bRect.height/2 + 18) / zRect.height * 100);
         char.style.left = targetLeft + '%';
         char.style.top = targetTop + '%';
-        char.style.transform = 'translateX(-50%) scale(1.08)';
+        char.style.transform = 'translateX(-50%) translateZ(18px) rotateX(-10deg) scale(1.08)';
         setTimeout(()=>{
-          char.style.transform = 'translateX(-50%) scale(1)';
+          char.style.transform = 'translateX(-50%) translateZ(18px) rotateX(-10deg) scale(1)';
           const ok=btn.dataset.ok==='true';
           const id=btn.dataset.alt;
           if(ok){
