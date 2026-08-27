@@ -43,12 +43,14 @@ export class ValleDeLasNubesGame {
         .valle-nubes[data-intensity="media"] .vn-dark{background:rgba(10,25,35,0.1)}
         .valle-nubes[data-intensity="alta"] .vn-dark{background:rgba(10,25,35,0.26)}
         .valle-nubes .vn-gamezone{position:relative;min-height:240px;margin-top:12px;padding:12px;border:1px dashed rgba(16,44,54,0.18);border-radius:10px;background:rgba(255,255,255,0.62);overflow:hidden}
-        .valle-nubes .vn-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
-        .valle-nubes .char{height:110px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,0.78);border:1px solid rgba(16,44,54,0.12);cursor:pointer;font-size:38px;animation:floaty 2.4s ease-in-out infinite}
+        .valle-nubes .vn-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px;perspective:800px}
+        .valle-nubes .char{height:118px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(180deg, #ffffff 0%, #eef6fb 100%);border:1px solid rgba(16,44,54,0.14);border-bottom:5px solid rgba(16,44,54,0.18);cursor:pointer;font-size:42px;animation:floaty 2.4s ease-in-out infinite;box-shadow:0 12px 22px rgba(16,44,54,0.14), 0 4px 10px rgba(16,44,54,0.08);transform:rotateX(6deg);transform-style:preserve-3d;transition:transform 160ms, box-shadow 160ms}
         .valle-nubes .char:nth-child(2){animation-delay:0.3s}.valle-nubes .char:nth-child(3){animation-delay:0.6s}.valle-nubes .char:nth-child(4){animation-delay:0.9s}
         @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-        .valle-nubes .char.correct{outline:3px solid #72c264;box-shadow:0 0 16px rgba(114,194,100,0.5)}
-        .valle-nubes .char.wrong{outline:3px solid #e76856;opacity:0.7}
+        .valle-nubes .char:hover{transform:rotateX(4deg) translateY(-4px);box-shadow:0 16px 28px rgba(16,44,54,0.18), 0 6px 12px rgba(16,44,54,0.1)}
+        .valle-nubes .char:active{transform:rotateX(8deg) translateY(2px) scale(0.98);border-bottom-width:2px}
+        .valle-nubes .char.correct{outline:3px solid #72c264;box-shadow:0 0 18px rgba(114,194,100,0.55), 0 14px 24px rgba(114,194,100,0.25);transform:rotateX(2deg) scale(1.02)}
+        .valle-nubes .char.wrong{outline:3px solid #e76856;opacity:0.72;transform:rotateX(10deg) scale(0.96)}
         .valle-nubes .falling{position:absolute;width:42px;height:42px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,0.9);border:1px solid rgba(16,44,54,0.12);cursor:pointer;user-select:none}
         .valle-nubes .falling.good{box-shadow:0 4px 12px rgba(49,120,168,0.25)}
         .valle-nubes .falling.bad{background:rgba(230,230,230,0.9)}
