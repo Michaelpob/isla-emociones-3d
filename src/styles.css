@@ -1324,6 +1324,177 @@ p {
   .volcano-prompt {
     display: none !important;
   }
+
+  .breathing-progress {
+    display: none;
+  }
+}
+
+/* Breathing calm game (Isla del Enojo) */
+.breathing-hud h2 {
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.breathing-hud .eyebrow {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.breathing-instruction {
+  margin-top: 6px;
+  max-width: 34ch;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.breathing-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.breathing-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  transition: background 200ms ease, transform 200ms ease;
+}
+
+.breathing-dot.active {
+  background: var(--breath-color, #ff6b4a);
+  box-shadow: 0 0 10px var(--breath-color, #ff6b4a);
+  transform: scale(1.35);
+}
+
+.breathing-dot.done {
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.breathing-stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.breath-button {
+  position: relative;
+  display: grid;
+  width: clamp(190px, 34vw, 260px);
+  height: clamp(190px, 34vw, 260px);
+  place-items: center;
+  border: 3px solid color-mix(in srgb, var(--breath-color, #ff6b4a), white 25%);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--breath-color, #ff6b4a), rgba(10, 10, 15, 0.85) 78%);
+  color: #ffffff;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  transition: transform 120ms ease, box-shadow 200ms ease, background 400ms ease, border-color 400ms ease;
+}
+
+.breath-button.is-pressed {
+  transform: scale(0.96);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.breath-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 78%;
+  height: 78%;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--breath-color, #ff6b4a), transparent 45%);
+  box-shadow: 0 0 70px color-mix(in srgb, var(--breath-color, #ff6b4a), transparent 25%);
+  transform: translate(-50%, -50%) scale(0.62);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.breath-button.is-waiting .breath-ring {
+  animation: breath-idle-pulse 2.6s ease-in-out infinite;
+}
+
+@keyframes breath-idle-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(0.58); opacity: 0.75; }
+  50% { transform: translate(-50%, -50%) scale(0.72); opacity: 1; }
+}
+
+.breath-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.breath-count {
+  font-size: clamp(2.6rem, 7vw, 3.6rem);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.breath-button-label {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.breathing-overlay--lose {
+  background: rgba(46, 10, 10, 0.88) !important;
+}
+
+.breathing-overlay--win {
+  background: rgba(8, 30, 27, 0.88) !important;
+}
+
+.breathing-panel--lose {
+  border-color: rgba(255, 110, 90, 0.35);
+  background: rgba(58, 14, 14, 0.92);
+  color: #ffd7cf;
+}
+
+.breathing-panel--lose h2 {
+  color: #ffb3a0;
+}
+
+.breathing-panel--lose .eyebrow {
+  color: rgba(255, 180, 160, 0.65);
+}
+
+.breathing-panel--win {
+  border-color: rgba(140, 232, 212, 0.35);
+  background: rgba(10, 40, 36, 0.92);
+  color: #cdf7ec;
+  animation: celebrate-pop 500ms ease;
+}
+
+.breathing-panel--win h2 {
+  color: #8ce8d4;
+}
+
+.breathing-panel--win .eyebrow {
+  color: rgba(140, 232, 212, 0.65);
+}
+
+@keyframes celebrate-pop {
+  0% { transform: scale(0.9); opacity: 0; }
+  60% { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+.minigame--breathing .game-exit {
+  z-index: 40;
 }
 
 

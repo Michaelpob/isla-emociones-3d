@@ -40,7 +40,7 @@ export const islands = [
     name: 'Enojo',
     displayName: 'Isla del Enojo',
     emoji: '🔥',
-    subtitle: 'Respira y controla la presion del volcan.',
+    subtitle: 'Sigue el ritmo del circulo y respira para calmar el enojo.',
     palette: {
       land: '#e76856',
       accent: '#b92d32',
@@ -51,7 +51,7 @@ export const islands = [
     position: [3.5, 0, -3],
     radius: 1.4,
     height: 0.48,
-    minigame: 'volcano-control'
+    minigame: 'guided-breathing'
   },
   {
     id: 'fear',
@@ -114,6 +114,7 @@ export const minigameLabels = {
   'support-rain': 'Valle de las Nubes',
   'valle-nubes': 'Valle de las Nubes',
   'volcano-control': 'Control del Volcan',
+  'guided-breathing': 'Respiracion Guiada',
   'darkness-light': 'Luz en la Oscuridad',
   'spirit-cleaning': 'Limpieza Espiritual',
   'surprise-boxes': 'Cajas Sorpresa',

@@ -358,7 +358,7 @@ export class EmotionIslandApp {
         <p class="eyebrow">Resultado</p>
         <h2>${title}</h2>
         <p>${result.message}</p>
-        <div class="result-score">${result.score}/${result.target} destellos</div>
+        ${result.target ? `<div class="result-score">${result.score}/${result.target} ${result.unit ?? 'destellos'}</div>` : ''}
         <button class="primary-action" type="button" data-back-map>Volver al mapa</button>
       </section>
     `;
