@@ -1,15 +1,15 @@
-import { VolcanoControlGame } from './VolcanoControlGame.js?v=20260908175209';
-import { BreathingCalmGame } from './BreathingCalmGame.js?v=20260908175209';
-import { ComingSoonGame } from './ComingSoonGame.js?v=20260908175209';
-import { FearIslandGame } from './fear/FearIslandGame.js?v=20260908175209';
-import { JoyValleyGame } from './joy/JoyValleyGame.js?v=20260908175209';
-import { DisgustGuardiansGame } from './disgust/DisgustGuardiansGame.js?v=20260908175209';
-import { AngerVolcanoGame } from './anger/AngerVolcanoGame.js?v=20260908175209';
-import { FearNightGame } from './fear/FearNightGame.js?v=20260908175209';
-import { SadnessRestoreGame } from './sadness/SadnessRestoreGame.js?v=20260908175209';
-import { JoyOrbsGame } from './joy/JoyOrbsGame.js?v=20260908175209';
-import { DisgustSortGame } from './disgust/DisgustSortGame.js?v=20260908175209';
-import { SurpriseObserveGame } from './surprise/SurpriseObserveGame.js?v=20260908175209';
+import { VolcanoControlGame } from './VolcanoControlGame.js?v=20260908180131';
+import { BreathingCalmGame } from './BreathingCalmGame.js?v=20260908180131';
+import { ComingSoonGame } from './ComingSoonGame.js?v=20260908180131';
+import { FearIslandGame } from './fear/FearIslandGame.js?v=20260908180131';
+import { JoyValleyGame } from './joy/JoyValleyGame.js?v=20260908180131';
+import { DisgustGuardiansGame } from './disgust/DisgustGuardiansGame.js?v=20260908180131';
+import { AngerVolcanoGame } from './anger/AngerVolcanoGame.js?v=20260908180131';
+import { FearNightGame } from './fear/FearNightGame.js?v=20260908180131';
+import { SadnessRestoreGame } from './sadness/SadnessRestoreGame.js?v=20260908180131';
+import { JoyOrbsGame } from './joy/JoyOrbsGame.js?v=20260908180131';
+import { DisgustSortGame } from './disgust/DisgustSortGame.js?v=20260908180131';
+import { SurpriseObserveGame } from './surprise/SurpriseObserveGame.js?v=20260908180131';
 
 export const minigameRegistry = {
   // Islas 3D jugables

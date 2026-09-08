@@ -61,6 +61,11 @@ def build():
     for name, content in keep.items():
         io.open(os.path.join(DOCS, name), 'w', encoding='utf-8', newline='\n').write(content)
 
+    # el plan de gameplay vive en la raiz y se publica dentro de docs/
+    plan = os.path.join(ROOT, 'PLAN-GAMEPLAY.md')
+    if os.path.exists(plan):
+        shutil.copy(plan, os.path.join(DOCS, 'PLAN-GAMEPLAY.md'))
+
     shutil.copytree(SRC, os.path.join(DOCS, 'src'))
 
     main = os.path.join(DOCS, 'src', 'main.js')
