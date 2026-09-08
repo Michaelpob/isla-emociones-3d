@@ -23,9 +23,11 @@ export const islands = [
   {
     id: 'sadness',
     name: 'Tristeza',
-    displayName: 'Isla de la Tristeza',
-    emoji: '🌧️',
-    subtitle: 'Isla en construccion.',
+    displayName: 'El mundo que vuelve',
+    emoji: '💧',
+    subtitle: 'Todo esta gris. Encuentra los fragmentos y devuelve el color.',
+    badge: 'Guardian de la Tristeza',
+    reward: 'Cristal del Recuerdo Positivo',
     palette: {
       land: '#7db8d6',
       accent: '#4f7ba8',
@@ -36,7 +38,7 @@ export const islands = [
     position: [0, 0, -4.5],
     radius: 1.25,
     height: 0.34,
-    minigame: 'coming-soon'
+    minigame: 'sadness-restore'
   },
   {
     id: 'anger',
@@ -124,6 +126,7 @@ export const islands = [
 export const minigameLabels = {
   'anger-volcano': 'Volcan de las Emociones',
   'fear-night': 'Bosque de la Noche',
+  'sadness-restore': 'El mundo que vuelve',
   'fear-island': 'Isla del Miedo',
   'joy-valley': 'Valle de la Luz',
   'disgust-guardians': 'Guardianes del Desagrado',

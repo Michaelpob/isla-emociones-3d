@@ -3,8 +3,8 @@
 // elecciones, paneles de actividad, particulas, recompensas y HUD.
 // Los flujos de cada isla se escriben como funciones async que usan estas primitivas.
 
-import { TOOLS } from '../data/tools.js';
-import { addPoints, addReward, prefersReducedMotion, gameState, setSetting } from '../data/gameState.js';
+import { TOOLS } from '../data/tools.js?v=20260908173652';
+import { addPoints, addReward, prefersReducedMotion, gameState, setSetting } from '../data/gameState.js?v=20260908173652';
 
 export const ABORTED = Symbol('stage-aborted');
 

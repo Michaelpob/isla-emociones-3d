@@ -11,6 +11,7 @@ import os
 import posixpath
 import re
 import shutil
+import time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, 'src')
@@ -27,6 +28,9 @@ ENTRIES = [
 ]
 
 REL_IMPORT = re.compile(r"""from\s*['"](\.[^'"]+)['"]""")
+# Imports relativos a .js dentro de nuestro codigo: se les anade ?v=BUILD para
+# que el navegador no sirva modulos cacheados tras una actualizacion.
+SRC_IMPORT = re.compile(r"""(from\s*['"])(\.{1,2}/[^'"]+\.js)(['"])""")
 CSS_IMPORT = re.compile(r"""^import\s+['"](\./[^'"]+\.css)['"];?[ \t]*\r?\n""", re.M)
 
 
@@ -75,8 +79,23 @@ def build():
         os.makedirs(os.path.dirname(dest), exist_ok=True)
         shutil.copy(os.path.join(JSM, *rel.split('/')), dest)
 
+    # Sello de version: evita que el navegador sirva modulos u hojas de estilo
+    # cacheados despues de una actualizacion (vite lo resuelve con hashes).
+    build_id = time.strftime('%Y%m%d%H%M%S')
+    for root, _dirs, files in os.walk(os.path.join(DOCS, 'src')):
+        for name in files:
+            if not name.endswith('.js'):
+                continue
+            path = os.path.join(root, name)
+            code = io.open(path, encoding='utf-8').read()
+            versioned = SRC_IMPORT.sub(
+                lambda m: '%s%s?v=%s%s' % (m.group(1), m.group(2), build_id, m.group(3)), code
+            )
+            if versioned != code:
+                io.open(path, 'w', encoding='utf-8', newline='\n').write(versioned)
+
     links = '\n'.join(
-        '    <link rel="stylesheet" href="./src/%s" />' % f for f in css_files
+        '    <link rel="stylesheet" href="./src/%s?v=%s" />' % (f, build_id) for f in css_files
     )
     html = """<!doctype html>
 <html lang="es">
@@ -94,15 +113,16 @@ def build():
         }
       }
     </script>
-    <script type="module" src="./src/main.js"></script>
+    <script type="module" src="./src/main.js?v=%s"></script>
   </head>
   <body>
     <div id="app"></div>
   </body>
 </html>
-""" % links
+""" % (links, build_id)
     io.open(os.path.join(DOCS, 'index.html'), 'w', encoding='utf-8', newline='\n').write(html)
 
+    print('build %s' % build_id)
     print('css: %s' % ', '.join(css_files))
     print('addons: %d' % len(addons))
 

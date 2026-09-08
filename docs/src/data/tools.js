@@ -172,5 +172,7 @@ export const BADGES = {
   fear: { id: 'fear', icon: '🕯️', name: 'Guardian del Miedo', island: 'Isla del Miedo' },
   joy: { id: 'joy', icon: '🌻', name: 'Guardian de la Alegria', island: 'Valle de la Luz' },
   anger: { id: 'anger', icon: '🌋', name: 'Guardian de la Ira', island: 'Volcan de las Emociones' },
-  disgust: { id: 'disgust', icon: '🍃', name: 'Guardian del Desagrado', island: 'Guardianes del Desagrado' }
+  disgust: { id: 'disgust', icon: '🍃', name: 'Guardian del Desagrado', island: 'Guardianes del Desagrado' },
+  sadness: { id: 'sadness', icon: '💧', name: 'Guardian de la Tristeza', island: 'El mundo que vuelve' },
+  surprise: { id: 'surprise', icon: '✨', name: 'Guardian de la Sorpresa', island: 'Isla de la Sorpresa' }
 };

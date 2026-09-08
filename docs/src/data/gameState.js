@@ -1,7 +1,7 @@
 // EMO-AVENTURA · Sistema central de estado
 // Guarda y recupera todo el progreso en localStorage. Ninguna accion resta puntos.
 
-import { TOOLS, BADGES } from './tools.js';
+import { TOOLS, BADGES } from './tools.js?v=20260908173652';
 
 const STORAGE_KEY = 'emo-aventura-state';
 

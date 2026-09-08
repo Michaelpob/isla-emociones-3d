@@ -1,14 +1,16 @@
 // EMO-AVENTURA · Pantallas globales
 // Caja de Herramientas · Mi Progreso · Final de la aventura
 
-import { TOOL_LIST, TOOLS, BADGES } from '../data/tools.js';
-import { gameState, getProgressSummary, ISLAND_CHAIN } from '../data/gameState.js';
+import { TOOL_LIST, TOOLS, BADGES } from '../data/tools.js?v=20260908173652';
+import { gameState, getProgressSummary, ISLAND_CHAIN } from '../data/gameState.js?v=20260908173652';
 
 const ISLAND_NAMES = {
   fear: 'Isla del Miedo',
   joy: 'Valle de la Luz',
   anger: 'Volcan de las Emociones',
-  disgust: 'Guardianes del Desagrado'
+  disgust: 'Guardianes del Desagrado',
+  sadness: 'El mundo que vuelve',
+  surprise: 'Isla de la Sorpresa'
 };
 
 function mountOverlay(host, html, { label = 'Pantalla' } = {}) {

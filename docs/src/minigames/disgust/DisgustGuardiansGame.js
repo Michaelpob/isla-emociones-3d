@@ -4,7 +4,7 @@
 // Flujo: INICIO -> ZONAS -> ¿ESTO ME GENERA DESAGRADO? -> ESPEJO DE LAS REACCIONES ->
 // TERMOMETRO -> ESTRATEGIAS SEGUN NIVEL -> REEVALUACION -> PROTEGE LA ISLA -> CIERRE
 
-import { Stage, ABORTED } from '../../engine/Stage.js';
+import { Stage, ABORTED } from '../../engine/Stage.js?v=20260908173652';
 import {
   startBreathingExercise,
   startAttentionGame,
@@ -15,14 +15,14 @@ import {
   intensityThermometer,
   alternativeStrategyNotice,
   reevaluationScreen
-} from '../../engine/activities.js';
+} from '../../engine/activities.js?v=20260908173652';
 import {
   completeActivity,
   setInitialIntensity,
   setStrategy,
   recordReevaluation,
   gameState
-} from '../../data/gameState.js';
+} from '../../data/gameState.js?v=20260908173652';
 
 export class DisgustGuardiansGame {
   constructor({ host, island, player, onComplete, onExit, onOpenToolbox }) {

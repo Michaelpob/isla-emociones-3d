@@ -9,9 +9,9 @@
 // de progreso.
 
 import * as THREE from 'three';
-import { MinigameBase } from '../../engine/MinigameBase.js';
-import { createGround, createSky, createLights, makeRock, GEO, scatterInstanced } from '../../engine/worldkit.js';
-import { addReward, completeActivity, recordReevaluation, setInitialIntensity } from '../../data/gameState.js';
+import { MinigameBase } from '../../engine/MinigameBase.js?v=20260908173652';
+import { createGround, createSky, createLights, makeRock, GEO, scatterInstanced } from '../../engine/worldkit.js?v=20260908173652';
+import { addReward, completeActivity, recordReevaluation, setInitialIntensity } from '../../data/gameState.js?v=20260908173652';
 
 const PHASES = [
   { id: 'in', label: 'INHALA', seconds: 4, hold: true },

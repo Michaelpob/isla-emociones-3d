@@ -3,7 +3,7 @@
 // NIVEL 1 REFUGIO DE LA RESPIRACION -> NIVEL 2 ESPEJO DE LOS PENSAMIENTOS ->
 // NIVEL 3 PUENTE DE LA EXPOSICION GUIADA -> CIERRE -> DESBLOQUEO
 
-import { Stage, ABORTED } from '../../engine/Stage.js';
+import { Stage, ABORTED } from '../../engine/Stage.js?v=20260908173652';
 import {
   startBreathingExercise,
   startReevaluationGame,
@@ -11,14 +11,14 @@ import {
   signalMirror,
   intensityThermometer,
   reevaluationScreen
-} from '../../engine/activities.js';
+} from '../../engine/activities.js?v=20260908173652';
 import {
   completeActivity,
   setInitialIntensity,
   setStrategy,
   recordReevaluation,
   gameState
-} from '../../data/gameState.js';
+} from '../../data/gameState.js?v=20260908173652';
 
 export class FearIslandGame {
   constructor({ host, island, player, onComplete, onExit, onOpenToolbox }) {

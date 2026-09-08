@@ -83,7 +83,7 @@ Escena Three.js del archipiélago: renderer con ACES + sombras PCF, cielo con gr
 |---|---|
 | 0 · Auditoría | ✅ este documento |
 | 1 · Núcleo 3D compartido | ✅ `PlayerController` · `Interactable` · `MinigameBase` · `Feedback` · `AudioBus` · `worldkit` |
-| 2 · Una mecánica por isla | 🔵 Enojo ✅ · Miedo ✅ · Tristeza ⏳ · Alegría ⏳ · Asco ⏳ · Sorpresa ⏳ |
+| 2 · Una mecánica por isla | 🔵 Enojo ✅ · Miedo ✅ · Tristeza ✅ · Alegría ⏳ · Asco ⏳ · Sorpresa ⏳ |
 | 3 · UI, feedback y progreso | ✅ para las islas 3D ya migradas |
 | 4 · Transiciones y cierre | ✅ portal físico + tarjeta final opcional |
 | 5 · Audio | ✅ capas sintetizadas + PositionalAudio + ducking |
@@ -128,3 +128,24 @@ Escena Three.js del archipiélago: renderer con ACES + sombras PCF, cielo con gr
 - 150 árboles en dos `InstancedMesh` (tronco y copa) + 260 matas: 12 draw calls, ~14.800 triángulos.
 
 **Verificado:** aterrizaje, gasto y recarga de batería, estado de oscuridad y recuperación, colisión contra troncos (el jugador se detiene a 0,8 m), los 5 faroles, amanecer, portal, tarjeta final e insignia.
+
+## Fase 2 · Isla de la Tristeza (implementada)
+
+`src/minigames/sadness/SadnessRestoreGame.js` · **tercera persona** · verbo **encontrar y restaurar**.
+
+- El mundo arranca gris, con niebla densa y **sin capas de audio**: solo el viento del propio jugador.
+- **6 fragmentos de recuerdo** flotando. Cada uno recogido dispara cuatro cosas a la vez:
+  1. una **onda de vegetación** que brota desde el fragmento (hierba, flores y árboles que ya existían con escala 0 y crecen con retardo según la distancia);
+  2. una **estructura caída que se reconstruye** pieza a pieza;
+  3. una **capa de audio** nueva (pad, agua, viento, campanas);
+  4. cielo, niebla, luz, color del suelo y color del propio avatar un paso más cálidos.
+- **No hay barra de progreso**: el paisaje es el progreso. Los puntos del HUD solo cuentan fragmentos.
+- Cada recuerdo se nombra en 3-4 palabras (`UNA TARDE DE LLUVIA`), nunca en párrafos.
+- Con los 6 recogidos el mundo florece y se abre el portal.
+
+Tristeza y Sorpresa tienen ahora insignia propia (Guardián de la Tristeza 💧, Guardián de la Sorpresa ✨) y la pantalla de isla completada funciona también para las islas fuera de la cadena de desbloqueo.
+
+**Verificado:** tercera persona con avatar animado, recogida de los 6 fragmentos, brote de vegetación, reconstrucción de las 6 estructuras, 4 capas de audio, transición completa del color, portal, tarjeta final e insignia. 15 draw calls, ~12.700 triángulos.
+
+### Mejora de build
+`scripts/build-docs.py` añade un sello de versión (`?v=AAAAMMDDhhmmss`) a los imports de nuestros módulos y a las hojas de estilo. Sin él, el navegador servía módulos cacheados tras una actualización (lo detectamos al no aparecer una insignia recién añadida). `docs/*.md` se conserva entre reconstrucciones.

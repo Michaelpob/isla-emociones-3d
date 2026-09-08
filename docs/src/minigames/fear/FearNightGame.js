@@ -8,9 +8,9 @@
 // respirar y seguir. El miedo se atraviesa a ritmo propio, no huyendo.
 
 import * as THREE from 'three';
-import { MinigameBase } from '../../engine/MinigameBase.js';
-import { createGround, createSky, createLights, GEO, scatterInstanced, makeTree } from '../../engine/worldkit.js';
-import { addReward, completeActivity, recordReevaluation, setInitialIntensity } from '../../data/gameState.js';
+import { MinigameBase } from '../../engine/MinigameBase.js?v=20260908173652';
+import { createGround, createSky, createLights, GEO, scatterInstanced, makeTree } from '../../engine/worldkit.js?v=20260908173652';
+import { addReward, completeActivity, recordReevaluation, setInitialIntensity } from '../../data/gameState.js?v=20260908173652';
 
 const LANTERNS = [
   { x: -8, z: -12 },

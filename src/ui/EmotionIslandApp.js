@@ -19,7 +19,9 @@ const ISLAND_NAMES = {
   fear: 'Isla del Miedo',
   joy: 'Valle de la Luz',
   anger: 'Volcan de las Emociones',
-  disgust: 'Guardianes del Desagrado'
+  disgust: 'Guardianes del Desagrado',
+  sadness: 'El mundo que vuelve',
+  surprise: 'Isla de la Sorpresa'
 };
 
 export class EmotionIslandApp {
@@ -420,16 +422,13 @@ export class EmotionIslandApp {
     if (result.success) {
       this.completed.add(result.islandId);
       window.localStorage.setItem('emotion-islands-progress', JSON.stringify([...this.completed]));
-      if (ISLAND_CHAIN.includes(result.islandId)) {
-        // La Isla del Enojo conserva su minijuego original: al completarlo
-        // entrega su herramienta y su insignia igual que el resto.
-        if (result.islandId === 'anger') addReward('gota-calma');
+      if (ISLAND_CHAIN.includes(result.islandId) || result.emoAventura) {
         unlockedId = completeIsland(result.islandId);
       }
       this.syncWorldState();
     }
 
-    if (ISLAND_CHAIN.includes(result.islandId) && result.success) {
+    if (result.emoAventura && result.success) {
       this.showIslandComplete(result, unlockedId);
       return;
     }

@@ -8,7 +8,9 @@ const ISLAND_NAMES = {
   fear: 'Isla del Miedo',
   joy: 'Valle de la Luz',
   anger: 'Volcan de las Emociones',
-  disgust: 'Guardianes del Desagrado'
+  disgust: 'Guardianes del Desagrado',
+  sadness: 'El mundo que vuelve',
+  surprise: 'Isla de la Sorpresa'
 };
 
 function mountOverlay(host, html, { label = 'Pantalla' } = {}) {

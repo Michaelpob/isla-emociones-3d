@@ -1,4 +1,4 @@
-import { EmotionIslandApp } from './ui/EmotionIslandApp.js';
+import { EmotionIslandApp } from './ui/EmotionIslandApp.js?v=20260908173652';
 
 const root = document.querySelector('#app');
 const app = new EmotionIslandApp(root);
