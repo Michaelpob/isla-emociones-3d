@@ -1,0 +1,245 @@
+/* EMO-AVENTURA · VALLE DE LA LUZ (Alegria)
+   Luz, colores vivos, flores, mariposas, rayos y particulas.
+   La iluminacion crece con --ambient (intensidad de la alegria). */
+
+.emo-theme-joy {
+  --char: #ffd479;
+  --emo-accent: #2f9e6b;
+}
+
+.emo-theme-joy .emo-sky {
+  --sky-top: #8fd7f2;
+  --sky-bottom: #ddf3c8;
+}
+
+.emo-theme-joy .emo-ground {
+  --ground: linear-gradient(180deg, #7cc067, #4f9448);
+}
+
+.emo-theme-joy .emo-layer--far {
+  height: 58%;
+  background-image:
+    radial-gradient(120px 70px at 16% 100%, #a9d98a 60%, transparent 61%),
+    radial-gradient(160px 90px at 45% 100%, #98cf7d 60%, transparent 61%),
+    radial-gradient(130px 76px at 78% 100%, #a9d98a 60%, transparent 61%);
+  background-size: 700px 100%;
+  animation: emo-drift-slower 140s linear infinite;
+}
+
+.emo-theme-joy .emo-layer--mid {
+  height: 40%;
+  background-image:
+    radial-gradient(26px 40px at 12% 100%, #3f8f4d 62%, transparent 63%),
+    radial-gradient(30px 52px at 32% 100%, #47a055 62%, transparent 63%),
+    radial-gradient(24px 38px at 58% 100%, #3f8f4d 62%, transparent 63%),
+    radial-gradient(34px 56px at 84% 100%, #47a055 62%, transparent 63%);
+  background-size: 380px 100%;
+  animation: emo-drift-slow 110s linear infinite;
+}
+
+/* rayos de luz: mas intensos cuanto mayor la alegria */
+.emo-theme-joy .emo-layer--near {
+  height: 100%;
+  background-image: repeating-linear-gradient(
+    102deg,
+    rgba(255, 245, 190, 0.24) 0 26px,
+    transparent 26px 96px
+  );
+  opacity: calc(0.25 + var(--ambient) * 0.6);
+  transition: opacity 900ms ease;
+  pointer-events: none;
+}
+
+/* flores y mariposas ambientales */
+.emo-theme-joy .emo-world::before {
+  content: '🌸  🦋   🌼    🦋   🌻  🌸   🌼';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 19%;
+  font-size: 20px;
+  letter-spacing: 46px;
+  opacity: calc(0.45 + var(--ambient) * 0.5);
+  animation: emo-bob 5.6s ease-in-out infinite;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.emo-theme-joy .emo-character__glow {
+  background: radial-gradient(circle, rgba(255, 240, 170, calc(0.35 + var(--ambient) * 0.4)), transparent 68%);
+}
+
+/* puntos del valle */
+.joy-spot {
+  position: absolute;
+  left: var(--x);
+  bottom: 25%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 14px;
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.86);
+  color: #1f4030;
+  font: inherit;
+  font-size: 0.84rem;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(30, 70, 50, 0.2);
+  animation: emo-bob 3.8s ease-in-out infinite;
+  transition: transform 180ms ease, box-shadow 220ms ease;
+}
+.joy-spot:hover { transform: translateX(-50%) translateY(-5px); box-shadow: 0 16px 30px rgba(30, 70, 50, 0.28); }
+.joy-spot:disabled { cursor: default; opacity: 0.65; }
+.joy-spot__icon { font-size: 28px; }
+.joy-spot.is-done { background: rgba(224, 247, 230, 0.92); opacity: 0.8; }
+.joy-spot.is-done::after {
+  content: '✓';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #2e9e6b;
+  color: #fff;
+  font-size: 0.8rem;
+}
+.joy-spot--route { bottom: 28%; }
+
+/* personajes del valle */
+.joy-friend {
+  position: absolute;
+  left: var(--x);
+  bottom: 22%;
+  transform: translateX(-50%);
+}
+.joy-friend__btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.8);
+  font: inherit;
+  cursor: pointer;
+  transition: transform 200ms ease;
+}
+.joy-friend__icon { font-size: 34px; display: block; animation: emo-idle 3.6s ease-in-out infinite; }
+.joy-friend__name { font-size: 0.78rem; font-weight: 700; color: #2a5541; }
+.joy-friend.is-near .joy-friend__btn { transform: scale(1.08); }
+.joy-friend.is-happy .joy-friend__icon { animation: emo-joy 700ms ease-in-out 3; }
+.joy-friend.is-done .joy-friend__btn { background: rgba(224, 247, 230, 0.95); }
+
+/* jardin de los momentos */
+.garden__field { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 12px; }
+.bud {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 10px;
+  border: 2px solid var(--emo-line);
+  border-radius: var(--emo-radius-sm);
+  background: #fff;
+  font: inherit;
+  color: var(--emo-ink);
+  cursor: pointer;
+  transition: transform 200ms ease, background 320ms ease, border-color 320ms ease;
+}
+.bud:hover { transform: translateY(-3px); }
+.bud__icon { font-size: 30px; transition: transform 420ms cubic-bezier(0.22, 1.4, 0.4, 1); }
+.bud__label { font-size: 0.86rem; text-align: center; line-height: 1.25; }
+.bud.is-open {
+  background: linear-gradient(180deg, #fffbe8, #ffeec2);
+  border-color: #ffd166;
+  cursor: default;
+}
+.bud.is-open .bud__icon { transform: scale(1.35) rotate(-8deg); }
+.bud.is-shake { animation: emo-shake 400ms ease; }
+.garden__note { margin: 0 0 12px; padding: 10px 12px; border-radius: 12px; background: var(--emo-paper-2); }
+
+/* mirador de los recuerdos */
+.memory { text-align: center; }
+.memory__crystal {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 12px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(120, 190, 240, calc(0.3 + var(--charge, 0) * 0.7)),
+    rgba(120, 190, 240, 0.08) 70%);
+  font-size: 54px;
+  transition: background 420ms ease;
+}
+.memory__crystal.is-pulse { animation: emo-pulse 420ms ease; }
+.memory__lead { margin: 0 0 12px; }
+.memory__details { display: grid; gap: 8px; margin-bottom: 12px; }
+.memory__detail {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 2px solid var(--emo-line);
+  border-radius: var(--emo-radius-sm);
+  background: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 160ms ease, background 220ms ease, border-color 220ms ease;
+}
+.memory__detail:hover { transform: translateY(-2px); border-color: var(--emo-accent); }
+.memory__detail.is-picked { background: #eaf6ff; border-color: #7cc0ea; cursor: default; }
+.memory__note { margin: 0 0 12px; color: var(--emo-ink-soft); }
+
+/* canalizar energia */
+.energy__lead { margin: 0 0 12px; }
+.energy__field { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 12px; }
+.energy__obstacle {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 10px;
+  border: 2px solid var(--emo-line);
+  border-radius: var(--emo-radius-sm);
+  background: #fff;
+  font: inherit;
+  color: var(--emo-ink);
+  font-size: 0.86rem;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 180ms ease, opacity 400ms ease;
+}
+.energy__icon { font-size: 30px; }
+.energy__beam {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 214, 102, 0.8), transparent);
+  transform: translateX(-100%);
+}
+.energy__obstacle.is-beaming .energy__beam { animation: emo-beam 420ms ease forwards; }
+@keyframes emo-beam {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+.energy__obstacle.is-cleared { opacity: 0.42; border-color: #bfe3d0; background: #eef7f2; cursor: default; }
+.energy__obstacle.is-cleared .energy__icon { transform: scale(0.8) rotate(18deg); }
+.energy__note { margin: 0 0 12px; padding: 10px 12px; border-radius: 12px; background: var(--emo-paper-2); }
+
+/* escenas del valle */
+.emo-theme-joy .emo-world[data-scene='jardin'] .emo-ground { --ground: linear-gradient(180deg, #93cf74, #5da24f); }
+.emo-theme-joy .emo-world[data-scene='mirador'] .emo-sky { --sky-top: #ffd9a0; --sky-bottom: #ffeccd; }
+.emo-theme-joy .emo-world[data-scene='sendero'] .emo-ground { --ground: linear-gradient(180deg, #c9b384, #8d7a52); }
+.emo-theme-joy .emo-world[data-scene='obstaculos'] .emo-ground { --ground: linear-gradient(180deg, #b7a97f, #7e7350); }
+.emo-theme-joy .emo-world[data-scene='equilibrio'] .emo-sky { --sky-top: #a5e0f5; --sky-bottom: #fff3cf; }

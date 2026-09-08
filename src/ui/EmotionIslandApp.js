@@ -2,14 +2,42 @@ import { islands, minigameLabels } from '../data/islands.js';
 import { WorldScene } from '../three/WorldScene.js';
 import { minigameRegistry } from '../minigames/index.js';
 import { getPlayer, savePlayer, hasPlayer, avatars, favoriteColors } from '../data/player.js';
+import {
+  gameState,
+  loadProgress,
+  isUnlocked,
+  lockedIslands,
+  completeIsland,
+  allIslandsCompleted,
+  addReward,
+  ISLAND_CHAIN
+} from '../data/gameState.js';
+import { BADGES } from '../data/tools.js';
+import { openToolbox, openProgress, openFinal } from './screens.js';
+
+const ISLAND_NAMES = {
+  fear: 'Isla del Miedo',
+  joy: 'Valle de la Luz',
+  anger: 'Volcan de las Emociones',
+  disgust: 'Guardianes del Desagrado'
+};
 
 export class EmotionIslandApp {
   constructor(root) {
     this.root = root;
     this.state = 'start';
-    this.completed = new Set(JSON.parse(window.localStorage.getItem('emotion-islands-progress') ?? '[]'));
+    loadProgress();
+    const legacy = JSON.parse(window.localStorage.getItem('emotion-islands-progress') ?? '[]');
+    this.completed = new Set([...legacy, ...gameState.completedIslands]);
     this.currentMinigame = null;
     this.player = getPlayer();
+  }
+
+  syncWorldState() {
+    if (!this.world) return;
+    this.completed = new Set([...this.completed, ...gameState.completedIslands]);
+    this.world.setCompleted(this.completed);
+    this.world.setLocked(lockedIslands());
   }
 
   start() {
@@ -26,7 +54,7 @@ export class EmotionIslandApp {
       onProximityChange: (island) => this.onProximityChange(island)
     });
     this.world.mount();
-    this.world.setCompleted(this.completed);
+    this.syncWorldState();
     if (this.player?.favoriteColor) {
       this.world.setPlayerAppearance(this.player.favoriteColor);
     }
@@ -42,20 +70,28 @@ export class EmotionIslandApp {
       this.overlayRoot.innerHTML = `
         <section class="start-screen">
           <div class="brand-mark">${this.player.avatar}</div>
+          <p class="start-screen__kicker">EMO-AVENTURA</p>
           <h1>Hola, ${this.player.name}</h1>
-          <p>Explora un archipielago 3D y completa retos breves sobre lo que sentimos.</p>
-          <button class="primary-action" type="button" data-start>Comenzar</button>
-          <button class="text-action" type="button" data-edit-profile>Mi perfil</button>
+          <p>Vive la aventura de descubrir el poder de tus emociones.</p>
+          <button class="primary-action" type="button" data-start>${gameState.completedIslands.length ? 'Continuar aventura' : 'Comenzar'}</button>
+          <div class="start-screen__links">
+            <button class="text-action" type="button" data-edit-profile>Mi perfil</button>
+            <button class="text-action" type="button" data-toolbox>Mi caja de herramientas</button>
+            <button class="text-action" type="button" data-progress>Mi progreso</button>
+          </div>
         </section>
       `;
       this.overlayRoot.querySelector('[data-start]').addEventListener('click', () => this.showMap());
       this.overlayRoot.querySelector('[data-edit-profile]').addEventListener('click', () => this.showProfile(true));
+      this.overlayRoot.querySelector('[data-toolbox]').addEventListener('click', () => openToolbox(this.root));
+      this.overlayRoot.querySelector('[data-progress]').addEventListener('click', () => openProgress(this.root));
     } else {
       this.overlayRoot.innerHTML = `
         <section class="start-screen">
-          <div class="brand-mark">IE</div>
+          <div class="brand-mark">EA</div>
+          <p class="start-screen__kicker">EMO-AVENTURA</p>
           <h1>Isla de las Emociones</h1>
-          <p>Explora un archipielago 3D y completa retos breves sobre lo que sentimos.</p>
+          <p>Vive la aventura de descubrir el poder de tus emociones: reconocelas, entiende su intensidad y aprende a regularlas.</p>
           <button class="primary-action" type="button" data-create-profile>Crear mi perfil</button>
         </section>
       `;
@@ -148,13 +184,15 @@ export class EmotionIslandApp {
     }
     this.state = 'map';
     this.world.focusMap();
+    this.syncWorldState();
     this.player = getPlayer();
-    const playerLabel = this.player ? `${this.player.avatar} ${this.player.name}` : '';
+
+    const doneChain = ISLAND_CHAIN.filter((id) => gameState.completedIslands.includes(id)).length;
 
     this.overlayRoot.innerHTML = `
       <section class="map-hud">
         <div>
-          <p class="eyebrow">Mapa principal</p>
+          <p class="eyebrow">EMO-AVENTURA · Mapa principal</p>
           <h2>Elige una isla</h2>
         </div>
         <div class="hud-right">
@@ -164,7 +202,10 @@ export class EmotionIslandApp {
               <span class="pill-name">${this.player.name}</span>
             </button>
           ` : ''}
-          <div class="progress-pill">${this.completed.size}/${islands.length} completadas</div>
+          <div class="progress-pill" title="Islas de la aventura completadas">${doneChain}/${ISLAND_CHAIN.length} islas</div>
+          <div class="progress-pill progress-pill--points" title="Puntos emocionales">✦ ${gameState.emotionalPoints}</div>
+          <button class="hud-icon" type="button" data-toolbox aria-label="Mi caja de herramientas">🧰</button>
+          <button class="hud-icon" type="button" data-progress aria-label="Mi progreso">📊</button>
         </div>
       </section>
       <div class="touch-controls" data-touch-controls>
@@ -184,6 +225,8 @@ export class EmotionIslandApp {
     if (editBtn) {
       editBtn.addEventListener('click', () => this.showProfile(true));
     }
+    this.overlayRoot.querySelector('[data-toolbox]')?.addEventListener('click', () => openToolbox(this.root));
+    this.overlayRoot.querySelector('[data-progress]')?.addEventListener('click', () => openProgress(this.root));
 
     this.setupTouchControls();
   }
@@ -278,9 +321,10 @@ export class EmotionIslandApp {
       this.overlayRoot.appendChild(prompt);
     }
     const completed = this.completed.has(island.id);
+    const locked = !isUnlocked(island.id);
     prompt.innerHTML = `
-      <strong>${island.displayName}</strong>
-      <span>${completed ? 'Volver a jugar' : 'Presiona E para entrar'}</span>
+      <strong>${locked ? '🔒 ' : ''}${island.displayName}</strong>
+      <span>${locked ? 'Bloqueada' : completed ? 'Volver a jugar' : 'Presiona E para entrar'}</span>
     `;
     prompt.style.setProperty('--accent', island.palette.ui);
   }
@@ -304,13 +348,39 @@ export class EmotionIslandApp {
     if (!island) return;
     this.state = 'island';
     this.world.focusOnIsland(id);
+
+    if (!isUnlocked(id)) {
+      const previous = ISLAND_CHAIN[ISLAND_CHAIN.indexOf(id) - 1];
+      this.overlayRoot.innerHTML = `
+        <section class="island-panel island-panel--locked" style="--accent:${island.palette.ui}">
+          <p class="eyebrow">🔒 Isla bloqueada</p>
+          <h2>${island.displayName}</h2>
+          <p>Para entrar aqui primero necesitas completar <strong>${ISLAND_NAMES[previous] ?? 'la isla anterior'}</strong>.</p>
+          <div class="panel-actions">
+            <button class="primary-action" type="button" data-go-previous>Ir a ${ISLAND_NAMES[previous] ?? 'la isla anterior'}</button>
+            <button class="secondary-action" type="button" data-back>Mapa</button>
+          </div>
+        </section>
+      `;
+      this.overlayRoot.querySelector('[data-go-previous]').addEventListener('click', () => this.selectIsland(previous));
+      this.overlayRoot.querySelector('[data-back]').addEventListener('click', () => this.showMap());
+      return;
+    }
+
+    const completed = this.completed.has(id);
+    const chapter = island.chapter ? `Capitulo ${island.chapter}` : island.name;
     this.overlayRoot.innerHTML = `
       <section class="island-panel" style="--accent:${island.palette.ui}">
-        <p class="eyebrow">${island.name}</p>
+        <p class="eyebrow">${chapter} · ${island.name}</p>
         <h2>${island.displayName}</h2>
         <p>${island.subtitle}</p>
+        ${island.badge ? `
+          <div class="island-panel__meta">
+            <span>${completed ? '🏅 Insignia obtenida' : `🏅 Insignia: ${island.badge}`}</span>
+            ${island.reward ? `<span>🎁 Recompensa: ${island.reward}</span>` : ''}
+          </div>` : ''}
         <div class="panel-actions">
-          <button class="primary-action" type="button" data-play>Jugar</button>
+          <button class="primary-action" type="button" data-play>${completed ? 'Volver a jugar' : 'Jugar'}</button>
           <button class="secondary-action" type="button" data-back>Mapa</button>
         </div>
       </section>
@@ -328,7 +398,8 @@ export class EmotionIslandApp {
       island,
       player: this.player,
       onComplete: (result) => this.showResult(result),
-      onExit: () => this.exitMinigame()
+      onExit: () => this.exitMinigame(),
+      onOpenToolbox: () => openToolbox(this.root)
     });
     this.currentMinigame.mount();
   }
@@ -342,10 +413,22 @@ export class EmotionIslandApp {
   showResult(result) {
     this.currentMinigame?.dispose();
     this.currentMinigame = null;
+    let unlockedId = null;
     if (result.success) {
       this.completed.add(result.islandId);
       window.localStorage.setItem('emotion-islands-progress', JSON.stringify([...this.completed]));
-      this.world.setCompleted(this.completed);
+      if (ISLAND_CHAIN.includes(result.islandId)) {
+        // La Isla del Enojo conserva su minijuego original: al completarlo
+        // entrega su herramienta y su insignia igual que el resto.
+        if (result.islandId === 'anger') addReward('gota-calma');
+        unlockedId = completeIsland(result.islandId);
+      }
+      this.syncWorldState();
+    }
+
+    if (ISLAND_CHAIN.includes(result.islandId) && result.success) {
+      this.showIslandComplete(result, unlockedId);
+      return;
     }
 
     const playerName = this.player?.name;
@@ -363,5 +446,51 @@ export class EmotionIslandApp {
       </section>
     `;
     this.overlayRoot.querySelector('[data-back-map]').addEventListener('click', () => this.showMap());
+  }
+
+  /** Cierre de una isla de EMO-AVENTURA: insignia, herramientas y desbloqueo */
+  showIslandComplete(result, unlockedId) {
+    const badge = BADGES[result.badge ?? result.islandId];
+    const nextName = unlockedId ? ISLAND_NAMES[unlockedId] : null;
+    const finished = allIslandsCompleted();
+
+    this.overlayRoot.innerHTML = `
+      <section class="island-complete">
+        <div class="island-complete__sparks" aria-hidden="true">
+          ${Array.from({ length: 12 }, (_, i) => `<i style="--i:${i}"></i>`).join('')}
+        </div>
+        <p class="eyebrow">Isla completada</p>
+        <div class="island-complete__badge">
+          <span class="island-complete__badge-icon" aria-hidden="true">${badge?.icon ?? '🏅'}</span>
+          <strong>${badge?.name ?? 'Insignia obtenida'}</strong>
+        </div>
+        <h2>${result.title}</h2>
+        <p>${result.message}</p>
+        <div class="island-complete__stats">
+          <span>✦ ${gameState.emotionalPoints} puntos</span>
+          <span>🧰 ${gameState.tools.length} herramientas</span>
+          <span>🏅 ${gameState.badges.length}/4 insignias</span>
+        </div>
+        ${nextName ? `
+          <div class="island-complete__unlock" data-unlock>
+            <span class="island-complete__lock" aria-hidden="true">🔓</span>
+            <p>Se desbloqueo <strong>${nextName}</strong></p>
+          </div>` : ''}
+        <div class="panel-actions">
+          <button class="primary-action" type="button" data-back-map>${finished ? 'Ver el final' : 'Volver al mapa'}</button>
+          <button class="secondary-action" type="button" data-toolbox>Mi caja</button>
+        </div>
+      </section>
+    `;
+
+    this.overlayRoot.querySelector('[data-toolbox]').addEventListener('click', () => openToolbox(this.root));
+    this.overlayRoot.querySelector('[data-back-map]').addEventListener('click', () => {
+      if (finished) {
+        openFinal(this.root, () => this.showMap());
+        this.world.setCompleted(new Set(ISLAND_CHAIN));
+      } else {
+        this.showMap();
+      }
+    });
   }
 }

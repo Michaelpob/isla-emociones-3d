@@ -146,6 +146,52 @@ export class WorldScene {
     });
   }
 
+  /** Islas bloqueadas: menor saturacion, oscurecidas y con candado flotante */
+  setLocked(lockedIds) {
+    this.locked = new Set(lockedIds ?? []);
+    const shade = new THREE.Color('#5a6472');
+    this.islandGroups.forEach((group, id) => {
+      const isLocked = this.locked.has(id);
+      group.userData.locked = isLocked;
+      group.traverse((child) => {
+        if (!child.isMesh || !child.material?.color) return;
+        if (!child.userData.baseColor) child.userData.baseColor = child.material.color.clone();
+        const color = child.userData.baseColor.clone();
+        if (isLocked) color.lerp(shade, 0.6).multiplyScalar(0.78);
+        child.material.color.copy(color);
+      });
+      let lock = group.getObjectByName(`${id}-lock`);
+      if (!lock) {
+        lock = this.createLockSprite();
+        lock.name = `${id}-lock`;
+        const island = this.islands.find((i) => i.id === id);
+        lock.position.y = (island?.height ?? 0.4) * 0.35 + 1.05;
+        lock.scale.set(0.55, 0.55, 1);
+        group.add(lock);
+      }
+      lock.visible = isLocked;
+      const emoji = group.getObjectByName(`${id}-emoji`);
+      if (emoji) emoji.material.opacity = isLocked ? 0.4 : 1;
+    });
+  }
+
+  isLocked(islandId) {
+    return this.locked ? this.locked.has(islandId) : false;
+  }
+
+  createLockSprite() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 128;
+    canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+    ctx.font = '92px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🔒', 64, 70);
+    const texture = new THREE.CanvasTexture(canvas);
+    return new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false }));
+  }
+
   focusMap() {
     this.focusMode = 'map';
     this.focusIsland = null;

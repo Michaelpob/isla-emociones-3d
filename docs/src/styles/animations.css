@@ -1,0 +1,188 @@
+/* EMO-AVENTURA · Animaciones
+   Ambientales (siempre activas, lentas), interactivas, emocionales,
+   de recompensa y de transicion. */
+
+@keyframes emo-rise {
+  from { opacity: 0; transform: translate(-50%, 18px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+.emo-toast { animation-name: emo-rise-plain; }
+@keyframes emo-rise-plain {
+  from { opacity: 0; transform: translateY(-14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes emo-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes emo-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes emo-pop {
+  0% { opacity: 0; transform: scale(0.86); }
+  60% { opacity: 1; transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes emo-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-3px); }
+}
+@keyframes emo-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.75; }
+  50% { transform: scale(1.12); opacity: 1; }
+}
+@keyframes emo-float-up {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-26px); }
+}
+@keyframes emo-morph {
+  0% { transform: scale(1) rotate(0deg); }
+  40% { transform: scale(1.06) rotate(-1.5deg); filter: blur(1px); }
+  100% { transform: scale(1) rotate(0deg); filter: blur(0); }
+}
+@keyframes emo-reward-in {
+  0% { opacity: 0; transform: scale(0.5); }
+  55% { opacity: 1; transform: scale(1.08); }
+  75% { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+@keyframes emo-reward-spin {
+  0%, 100% { transform: rotate(-6deg) translateY(0); }
+  50% { transform: rotate(6deg) translateY(-6px); }
+}
+@keyframes emo-spark-out {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% {
+    opacity: 0;
+    transform:
+      translate(calc(-50% + cos(calc(var(--i) * 40deg)) * 180px),
+                calc(-50% + sin(calc(var(--i) * 40deg)) * 180px))
+      scale(0.2);
+  }
+}
+@keyframes emo-spark-fly {
+  0% { opacity: 1; transform: translate(-50%, 0) scale(var(--s, 1)); }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), var(--ty)) scale(0.4); }
+}
+@keyframes emo-unlock {
+  0% { transform: rotate(0deg) scale(1); }
+  30% { transform: rotate(-16deg) scale(1.2); }
+  60% { transform: rotate(14deg) scale(1.2); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+@keyframes emo-badge-glow {
+  0%, 100% { box-shadow: 0 0 18px rgba(255, 214, 120, 0.3); }
+  50% { box-shadow: 0 0 34px rgba(255, 214, 120, 0.7); }
+}
+
+/* ------------------------------------------- personaje: estados animados */
+
+.emo-character[data-state='idle'] .emo-character__body { animation: emo-idle 3.4s ease-in-out infinite; }
+@keyframes emo-idle {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(-4px) scaleY(1.02); }
+}
+
+.emo-character[data-state='walk'] .emo-character__body { animation: emo-walk 480ms ease-in-out infinite; }
+@keyframes emo-walk {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-9px) rotate(3deg); }
+}
+
+.emo-character[data-state='interact'] .emo-character__body { animation: emo-interact 700ms ease; }
+@keyframes emo-interact {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.12) translateY(-6px); }
+  100% { transform: scale(1); }
+}
+
+.emo-character[data-state='celebrate'] .emo-character__body { animation: emo-celebrate 700ms ease-in-out infinite; }
+@keyframes emo-celebrate {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-18px) rotate(-8deg); }
+  75% { transform: translateY(-12px) rotate(8deg); }
+}
+
+.emo-character[data-state='think'] .emo-character__body { animation: emo-think 2.4s ease-in-out infinite; }
+@keyframes emo-think {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg) translateY(-3px); }
+}
+
+.emo-character[data-state='breathe'] .emo-character__body { animation: emo-breathe 5s ease-in-out infinite; }
+@keyframes emo-breathe {
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(1.12); }
+  70% { transform: scale(0.97); }
+}
+
+.emo-character[data-state='surprise'] .emo-character__body { animation: emo-surprise 520ms ease; }
+@keyframes emo-surprise {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.2) translateY(-14px); }
+  100% { transform: scale(1); }
+}
+
+.emo-character[data-state='fear'] .emo-character__body { animation: emo-tremble 320ms linear infinite; }
+@keyframes emo-tremble {
+  0%, 100% { transform: translateX(0) scale(0.96); }
+  25% { transform: translateX(-3px) scale(0.96); }
+  75% { transform: translateX(3px) scale(0.96); }
+}
+
+.emo-character[data-state='joy'] .emo-character__body { animation: emo-joy 620ms ease-in-out infinite; }
+@keyframes emo-joy {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-14px) scale(1.05); }
+}
+
+.emo-character[data-state='anger'] .emo-character__body { animation: emo-anger 260ms linear infinite; }
+@keyframes emo-anger {
+  0%, 100% { transform: translateX(0) scale(1.04); }
+  50% { transform: translateX(4px) scale(1.04); }
+}
+
+.emo-character[data-state='disgust'] .emo-character__body { animation: emo-disgust 900ms ease-in-out; }
+@keyframes emo-disgust {
+  0% { transform: scale(1) rotate(0deg); }
+  30% { transform: scale(0.94) rotate(-6deg) translateX(-8px); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.emo-character[data-state='pause'] .emo-character__body { animation: none; transform: scale(0.97); }
+
+/* Alegria alta / ira alta: el mundo se mueve mas lento */
+.emo-world[data-slow='true'] .emo-character { transition-duration: 2600ms; }
+.emo-world[data-slow='true'] .emo-layer { animation-duration: 90s !important; }
+
+/* ------------------------------------------------- ambiente (siempre activo) */
+
+@keyframes emo-drift-slow {
+  from { background-position-x: 0; }
+  to { background-position-x: -1200px; }
+}
+@keyframes emo-drift-slower {
+  from { background-position-x: 0; }
+  to { background-position-x: -800px; }
+}
+@keyframes emo-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* --------------------------------------------- preferencia: menos animacion */
+
+.emo-game[data-reduce-motion='true'] *,
+.emo-game[data-reduce-motion='true'] *::before,
+.emo-game[data-reduce-motion='true'] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 90ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emo-game *,
+  .emo-game *::before,
+  .emo-game *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 90ms !important;
+  }
+}

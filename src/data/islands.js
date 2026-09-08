@@ -2,9 +2,12 @@ export const islands = [
   {
     id: 'joy',
     name: 'Alegria',
-    displayName: 'Isla de la Alegria',
-    emoji: '🌈',
-    subtitle: 'Isla en construccion.',
+    displayName: 'Valle de la Luz',
+    emoji: '🌻',
+    subtitle: 'Reconoce la alegria, disfrutala y aprende a regularla sin apagarla.',
+    chapter: 2,
+    badge: 'Guardian de la Alegria',
+    reward: 'Estrella del Disfrute',
     palette: {
       land: '#f6c85f',
       accent: '#ff8a3d',
@@ -15,7 +18,7 @@ export const islands = [
     position: [-3.5, 0, -3],
     radius: 1.3,
     height: 0.4,
-    minigame: 'coming-soon'
+    minigame: 'joy-valley'
   },
   {
     id: 'sadness',
@@ -38,9 +41,12 @@ export const islands = [
   {
     id: 'anger',
     name: 'Enojo',
-    displayName: 'Isla del Enojo',
+    displayName: 'Volcan de las Emociones',
     emoji: '🔥',
     subtitle: 'Sigue el ritmo del circulo y respira para calmar el enojo.',
+    chapter: 3,
+    badge: 'Guardian de la Ira',
+    reward: 'Gota de Calma',
     palette: {
       land: '#e76856',
       accent: '#b92d32',
@@ -57,8 +63,11 @@ export const islands = [
     id: 'fear',
     name: 'Miedo',
     displayName: 'Isla del Miedo',
-    emoji: '🌑',
-    subtitle: 'Isla en construccion.',
+    emoji: '🌫️',
+    subtitle: 'Atraviesa la niebla: reconoce el miedo y aprende a avanzar con el.',
+    chapter: 1,
+    badge: 'Guardian del Miedo',
+    reward: 'Lupa de la Realidad',
     palette: {
       land: '#6c5a94',
       accent: '#403a67',
@@ -69,14 +78,17 @@ export const islands = [
     position: [-3.5, 0, 2],
     radius: 1.3,
     height: 0.38,
-    minigame: 'coming-soon'
+    minigame: 'fear-island'
   },
   {
     id: 'disgust',
     name: 'Desagrado',
-    displayName: 'Isla del Desagrado',
-    emoji: '💚',
-    subtitle: 'Isla en construccion.',
+    displayName: 'Guardianes del Desagrado',
+    emoji: '🍃',
+    subtitle: 'Territorio de las sensaciones incomodas: sentir sin reaccionar de golpe.',
+    chapter: 4,
+    badge: 'Guardian del Desagrado',
+    reward: 'Semilla de Aceptacion',
     palette: {
       land: '#6ab86a',
       accent: '#3a8a3a',
@@ -87,7 +99,7 @@ export const islands = [
     position: [0, 0, 3.5],
     radius: 1.2,
     height: 0.36,
-    minigame: 'coming-soon'
+    minigame: 'disgust-guardians'
   },
   {
     id: 'surprise',
@@ -110,6 +122,9 @@ export const islands = [
 ];
 
 export const minigameLabels = {
+  'fear-island': 'Isla del Miedo',
+  'joy-valley': 'Valle de la Luz',
+  'disgust-guardians': 'Guardianes del Desagrado',
   'volcano-control': 'Control del Volcan',
   'guided-breathing': 'Respiracion Guiada',
   'coming-soon': 'Prototipo listo para ampliar'
