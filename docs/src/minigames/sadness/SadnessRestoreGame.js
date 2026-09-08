@@ -8,11 +8,11 @@
 // No hay barra de progreso: el progreso ES el paisaje.
 
 import * as THREE from 'three';
-import { MinigameBase } from '../../engine/MinigameBase.js?v=20260908173652';
+import { MinigameBase } from '../../engine/MinigameBase.js?v=20260908174045';
 import {
   createGround, createSky, createLights, GEO, scatterInstanced, makeAvatar, animateAvatar
-} from '../../engine/worldkit.js?v=20260908173652';
-import { addReward, completeActivity, recordReevaluation } from '../../data/gameState.js?v=20260908173652';
+} from '../../engine/worldkit.js?v=20260908174045';
+import { addReward, completeActivity, recordReevaluation } from '../../data/gameState.js?v=20260908174045';
 
 const FRAGMENTS = [
   { x: -14, z: -10, color: '#ffd6a5', layer: 'pad', memory: 'Una tarde de lluvia' },

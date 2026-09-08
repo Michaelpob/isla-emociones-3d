@@ -4,7 +4,7 @@ export const islands = [
     name: 'Alegria',
     displayName: 'Valle de la Luz',
     emoji: '🌻',
-    subtitle: 'Reconoce la alegria, disfrutala y aprende a regularla sin apagarla.',
+    subtitle: 'Salta entre plataformas y recoge los orbes: el valle se enciende contigo.',
     chapter: 2,
     badge: 'Guardian de la Alegria',
     reward: 'Estrella del Disfrute',
@@ -18,7 +18,7 @@ export const islands = [
     position: [-3.5, 0, -3],
     radius: 1.3,
     height: 0.4,
-    minigame: 'joy-valley'
+    minigame: 'joy-orbs'
   },
   {
     id: 'sadness',
@@ -127,6 +127,7 @@ export const minigameLabels = {
   'anger-volcano': 'Volcan de las Emociones',
   'fear-night': 'Bosque de la Noche',
   'sadness-restore': 'El mundo que vuelve',
+  'joy-orbs': 'Valle de la Luz',
   'fear-island': 'Isla del Miedo',
   'joy-valley': 'Valle de la Luz',
   'disgust-guardians': 'Guardianes del Desagrado',

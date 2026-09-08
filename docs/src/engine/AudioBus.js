@@ -7,7 +7,7 @@
 // suave, respiracion). Ducking: al concentrarse/respirar el ambiente baja.
 
 import * as THREE from 'three';
-import { gameState } from '../data/gameState.js?v=20260908173652';
+import { gameState } from '../data/gameState.js?v=20260908174045';
 
 const CACHE = new Map();
 

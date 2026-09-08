@@ -1,8 +1,8 @@
 // EMO-AVENTURA · Pantallas globales
 // Caja de Herramientas · Mi Progreso · Final de la aventura
 
-import { TOOL_LIST, TOOLS, BADGES } from '../data/tools.js?v=20260908173652';
-import { gameState, getProgressSummary, ISLAND_CHAIN } from '../data/gameState.js?v=20260908173652';
+import { TOOL_LIST, TOOLS, BADGES } from '../data/tools.js?v=20260908174045';
+import { gameState, getProgressSummary, ISLAND_CHAIN } from '../data/gameState.js?v=20260908174045';
 
 const ISLAND_NAMES = {
   fear: 'Isla del Miedo',

@@ -83,7 +83,7 @@ Escena Three.js del archipiélago: renderer con ACES + sombras PCF, cielo con gr
 |---|---|
 | 0 · Auditoría | ✅ este documento |
 | 1 · Núcleo 3D compartido | ✅ `PlayerController` · `Interactable` · `MinigameBase` · `Feedback` · `AudioBus` · `worldkit` |
-| 2 · Una mecánica por isla | 🔵 Enojo ✅ · Miedo ✅ · Tristeza ✅ · Alegría ⏳ · Asco ⏳ · Sorpresa ⏳ |
+| 2 · Una mecánica por isla | 🔵 Enojo ✅ · Miedo ✅ · Tristeza ✅ · Alegría ✅ · Asco ⏳ · Sorpresa ⏳ |
 | 3 · UI, feedback y progreso | ✅ para las islas 3D ya migradas |
 | 4 · Transiciones y cierre | ✅ portal físico + tarjeta final opcional |
 | 5 · Audio | ✅ capas sintetizadas + PositionalAudio + ducking |
@@ -149,3 +149,16 @@ Tristeza y Sorpresa tienen ahora insignia propia (Guardián de la Tristeza 💧,
 
 ### Mejora de build
 `scripts/build-docs.py` añade un sello de versión (`?v=AAAAMMDDhhmmss`) a los imports de nuestros módulos y a las hojas de estilo. Sin él, el navegador servía módulos cacheados tras una actualización (lo detectamos al no aparecer una insignia recién añadida). `docs/*.md` se conserva entre reconstrucciones.
+
+## Fase 2 · Valle de la Luz / Alegría (implementada)
+
+`src/minigames/joy/JoyOrbsGame.js` · **tercera persona** · verbo **saltar y recoger**.
+
+- 10 **plataformas flotantes** (de un solo sentido: sostienen solo si caes desde arriba) con un balanceo mínimo, y 12 **orbes de luz** sobre ellas y en el aire.
+- Los orbes **no se pulsan**: se recogen por contacto corriendo y saltando. El tono del sonido sube con el combo.
+- **Combo**: cada orbe recogido en el aire suma; tocar el suelo lo reinicia. Romperlo no penaliza, solo deja de sumar. El mejor combo de la partida se muestra al final.
+- Cada orbe **hace crecer el valle** (flores y árboles brotando desde la posición del jugador), sube la luz del sol, aclara la niebla, calienta el cielo y, cada tres orbes, entra una capa de música.
+- Con los 12 recogidos el valle brilla y se abre el portal.
+- La lectura psicoeducativa es la contraria a "bajar" la emoción: aquí la alegría se usa como impulso y llega más lejos.
+
+**Verificado:** salto y aterrizaje sobre plataforma (y = 1,80 exacto), recogida por contacto, combo en el aire (11 encadenados en la prueba), crecimiento de vegetación, 4 capas de audio, portal, tarjeta final e insignia.
