@@ -1,94 +1,82 @@
-# EMO-AVENTURA
+# EMO-AVENTURA · Isla Emociones 3D
 
 > "Vive la aventura de descubrir el poder de tus emociones"
 
-Videojuego web educativo sobre reconocimiento y regulacion emocional. El jugador
-recorre un archipielago 3D, entra en cada isla, identifica una emocion, reconoce
-sus manifestaciones, mide su intensidad, practica estrategias de regulacion en
-minijuegos reales, reevalua como quedo y desbloquea la siguiente isla.
+Mundo 3D jugable sobre reconocimiento y regulación emocional. Desde un mapa
+central se entra a seis islas y **cada una tiene una mecánica de juego distinta**,
+derivada de la emoción que representa. Nada de "texto + botón + barra de
+progreso": se juega moviéndose, mirando, empujando, saltando y sosteniendo.
 
-**Regla psicoeducativa central:** ninguna emocion es mala. Regular no significa
-dejar de sentir, y ninguna eleccion del jugador resta puntos, vidas ni progreso.
+**Principio pedagógico:** ninguna emoción es mala; regular no es dejar de sentir;
+ninguna decisión del jugador resta puntos, vidas ni progreso. No hay *game over*,
+solo reintento.
 
 ## Ejecutar
 
 ```bash
-npm run dev      # vite build + servidor local (requiere Node)
-python scripts/build-docs.py   # build sin Node -> docs/ (GitHub Pages)
+pnpm install && pnpm dev          # con Node
+python scripts/build-docs.py      # build sin Node -> /docs (GitHub Pages)
 python -m http.server 8000 -d docs
 ```
 
-`docs/` es lo que publica GitHub Pages. Si hay Node, `npm run build` (vite) lo
-regenera; si no, `scripts/build-docs.py` arma la misma carpeta con un importmap
-y three.js copiado desde `node_modules`.
+Controles: **WASD** moverse · **SHIFT** correr · **SPACE** saltar · **E**
+interactuar (mantener pulsado donde toque) · **ESC** pausa · **F3** medidor de
+rendimiento. En táctil: joystick izquierdo, arrastre derecho para la cámara y
+botones de saltar/interactuar.
 
-## Islas
+## Las seis islas
 
-| Isla | Estado | Contenido |
-|---|---|---|
-| 1. Isla del Miedo | EMO-AVENTURA | Exploracion, manifestaciones, Refugio de la Respiracion, Espejo de los Pensamientos, Puente de la Exposicion Guiada |
-| 2. Valle de la Luz (Alegria) | EMO-AVENTURA | Identificacion, Espejo de la Luz, intensidad, 7 estrategias con minijuego propio, Encuentra el equilibrio |
-| 3. Volcan de las Emociones (Ira) | minijuego previo | Respiracion guiada (`BreathingCalmGame`, sin cambios) |
-| 4. Guardianes del Desagrado | EMO-AVENTURA | 4 zonas, Espejo de las Reacciones, termometro, 6 estrategias, desafio "Protege la isla" |
-| Tristeza · Sorpresa | en construccion | Fuera de la cadena de desbloqueo |
+| Isla | Emoción | Vista | Verbo | Reto |
+|---|---|---|---|---|
+| Volcán de las Emociones | Ira | 1ª persona | **mantener bajo presión** | 4 focos de tensión con respiración 4-4-4-4 manteniendo pulsado; el mundo se calma con cada uno |
+| Bosque de la Noche | Miedo | 1ª persona | **explorar en la oscuridad** | Linterna con batería: correr la gasta, respirar la recarga; encender 5 faroles |
+| El mundo que vuelve | Tristeza | 3ª persona | **encontrar y restaurar** | 6 fragmentos de recuerdo; cada uno hace brotar vegetación, reconstruye una estructura y añade una capa de audio |
+| Valle de la Luz | Alegría | 3ª persona | **saltar y recoger** | 12 orbes entre plataformas flotantes, con combo si no tocas el suelo |
+| Guardianes del Desagrado | Asco | 1ª persona | **manipular y ordenar** | Empujar objetos con el cuerpo a su contenedor en 4 zonas y activar las válvulas |
+| El jardín que cambia | Sorpresa | 1ª persona | **observar** | Algo cambia siempre fuera de tu campo de visión: date cuenta y acércate |
 
-Desbloqueo: **Miedo → Alegria → Ira → Desagrado**. El progreso se guarda en
-`localStorage` y sobrevive a recargas.
+Al superar cada reto se abre un **portal físico** en la escena que el jugador
+cruza por su propia voluntad: no hay pantalla de "minijuego completado".
+La explicación psicoeducativa está en una **tarjeta final opcional**.
 
 ## Estructura
 
 ```
 src/
-├── data/
-│   ├── islands.js      configuracion de islas del mapa 3D
-│   ├── gameState.js    estado central (puntos, herramientas, insignias, desbloqueos)
-│   ├── tools.js        catalogo de herramientas e insignias
-│   └── player.js       perfil del jugador
-├── engine/
-│   ├── Stage.js        motor de escena: capas, personaje, dialogos, recompensas, HUD
-│   └── activities.js   minijuegos reutilizables (respiracion, reevaluacion,
-│                       espejo de senales, secuencias, puente, atencion,
-│                       5-4-3-2-1, termometro, reevaluacion final)
+├── engine/                núcleo 3D compartido
+│   ├── PlayerController.js   WASD, pointer lock, 3ª persona, gravedad, colisiones
+│   ├── Interactable.js       radio de activación, chip [E], realce
+│   ├── MinigameBase.js       init/start/update/pause/reset/dispose + HUD + portal
+│   ├── Feedback.js           partículas con pooling, flash, shake, tweens
+│   ├── AudioBus.js           sonidos sintetizados, PositionalAudio, ducking
+│   ├── worldkit.js           terreno, InstancedMesh, cielo, luces, avatar
+│   ├── Stage.js              motor 2D (tarjetas psicoeducativas)
+│   └── activities.js         actividades 2D reutilizables
 ├── minigames/
-│   ├── fear/FearIslandGame.js
-│   ├── joy/JoyValleyGame.js
-│   ├── disgust/DisgustGuardiansGame.js
-│   ├── BreathingCalmGame.js   (Isla del Enojo, intacto)
-│   └── index.js               registro de minijuegos
-├── three/              escena 3D del archipielago (mapa principal)
-├── ui/
-│   ├── EmotionIslandApp.js  flujo de pantallas, bloqueo/desbloqueo de islas
-│   └── screens.js           caja de herramientas, progreso, final
-└── styles/             emo · animations · fear · joy · disgust · responsive
+│   ├── anger/AngerVolcanoGame.js      fear/FearNightGame.js
+│   ├── sadness/SadnessRestoreGame.js  joy/JoyOrbsGame.js
+│   ├── disgust/DisgustSortGame.js     surprise/SurpriseObserveGame.js
+│   └── index.js                        registro de minijuegos
+├── data/       islands · gameState · tools · player
+├── three/      mapa 3D principal (hub)
+├── ui/         EmotionIslandApp · screens
+└── styles/     island3d.css + estilos de las pantallas
 ```
 
-## Sistema de estado
+`docs/PLAN-GAMEPLAY.md` documenta la auditoría, lo implementado en cada fase, el
+checklist de verificación y las medidas de rendimiento por isla.
 
-`src/data/gameState.js` expone las funciones reutilizables del juego:
+## Progreso y recompensas
 
-```js
-loadProgress() saveProgress() resetGame()
-addPoints() completeActivity() addReward() addBadge()
-unlockIsland() completeIsland() isUnlocked() allIslandsCompleted()
-changeIntensity() setInitialIntensity() setStrategy() recordReevaluation()
-getProgressSummary() setSetting() prefersReducedMotion()
-```
+`src/data/gameState.js` guarda en `localStorage` puntos, herramientas,
+insignias, actividades, intensidades, reevaluaciones y desbloqueos. Cada isla 3D
+entrega sus herramientas y su insignia al cruzar el portal. La cadena de
+desbloqueo del mapa es **Miedo → Alegría → Ira → Desagrado**; Tristeza y Sorpresa
+están siempre abiertas.
 
-Cada reevaluacion guarda `{ initialIntensity, strategy, finalIntensity }` y se
-muestra en *Mi progreso* como INICIAL → ESTRATEGIA → FINAL. Que la intensidad
-baje no se interpreta automaticamente como "ganar".
+## Añadir una isla
 
-## Accesibilidad
-
-Contraste alto, botones de 42px minimo, foco visible, navegacion por teclado,
-`aria-live` en marcadores y feedback, texto ademas del color, boton para reducir
-animaciones (ademas de respetar `prefers-reduced-motion`) y sonido opcional
-con interruptor.
-
-## Agregar una isla
-
-1. Agrega su entrada en `src/data/islands.js` (`minigame: 'mi-isla'`).
-2. Crea la clase del minijuego con `mount()` / `dispose()` y llama
-   `onComplete({ islandId, success: true, emoAventura: true, badge, title, message })`.
-3. Registrala en `src/minigames/index.js`.
-4. Si entra en la cadena de desbloqueo, agregala a `ISLAND_CHAIN` en `gameState.js`.
+1. Crea la clase extendiendo `MinigameBase` e implementa `build()`, `onUpdate(dt)`
+   y `onReset()`.
+2. Llama `this.openPortal(pos)` al superar el reto y `this.finish()` al cruzarlo.
+3. Regístrala en `src/minigames/index.js` y apunta la isla en `src/data/islands.js`.
