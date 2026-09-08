@@ -9,11 +9,11 @@
 // salir de una isla no deja residuo en la siguiente.
 
 import * as THREE from 'three';
-import { PlayerController } from './PlayerController.js?v=20260908174459';
-import { InteractableManager, Interactable } from './Interactable.js?v=20260908174459';
-import { Feedback } from './Feedback.js?v=20260908174459';
-import { AudioBus } from './AudioBus.js?v=20260908174459';
-import { gameState, setSetting, prefersReducedMotion } from '../data/gameState.js?v=20260908174459';
+import { PlayerController } from './PlayerController.js?v=20260908175209';
+import { InteractableManager, Interactable } from './Interactable.js?v=20260908175209';
+import { Feedback } from './Feedback.js?v=20260908175209';
+import { AudioBus } from './AudioBus.js?v=20260908175209';
+import { gameState, setSetting, prefersReducedMotion } from '../data/gameState.js?v=20260908175209';
 
 export class MinigameBase {
   constructor({ host, island, player, onComplete, onExit, onOpenToolbox, mode = 'first' }) {

@@ -8,11 +8,11 @@
 // La alegria no hay que "bajarla": aqui se expande.
 
 import * as THREE from 'three';
-import { MinigameBase } from '../../engine/MinigameBase.js?v=20260908174459';
+import { MinigameBase } from '../../engine/MinigameBase.js?v=20260908175209';
 import {
   createGround, createSky, createLights, GEO, scatterInstanced, makeAvatar, animateAvatar
-} from '../../engine/worldkit.js?v=20260908174459';
-import { addReward, completeActivity, recordReevaluation } from '../../data/gameState.js?v=20260908174459';
+} from '../../engine/worldkit.js?v=20260908175209';
+import { addReward, completeActivity, recordReevaluation } from '../../data/gameState.js?v=20260908175209';
 
 // Plataformas: [x, y, z, ancho, fondo]
 const PLATFORMS = [

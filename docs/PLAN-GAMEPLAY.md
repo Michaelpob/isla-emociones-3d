@@ -83,7 +83,7 @@ Escena Three.js del archipiélago: renderer con ACES + sombras PCF, cielo con gr
 |---|---|
 | 0 · Auditoría | ✅ este documento |
 | 1 · Núcleo 3D compartido | ✅ `PlayerController` · `Interactable` · `MinigameBase` · `Feedback` · `AudioBus` · `worldkit` |
-| 2 · Una mecánica por isla | 🔵 Enojo ✅ · Miedo ✅ · Tristeza ✅ · Alegría ✅ · Asco ✅ · Sorpresa ⏳ |
+| 2 · Una mecánica por isla | ✅ las 6 islas, con un verbo distinto cada una |
 | 3 · UI, feedback y progreso | ✅ para las islas 3D ya migradas |
 | 4 · Transiciones y cierre | ✅ portal físico + tarjeta final opcional |
 | 5 · Audio | ✅ capas sintetizadas + PositionalAudio + ducking |
@@ -175,3 +175,61 @@ Tristeza y Sorpresa tienen ahora insignia propia (Guardián de la Tristeza 💧,
 - Cada zona incluye a propósito **algo que merece conservarse**: cuando el rechazo lo ocupa todo, también se tira lo bueno.
 
 **Verificado:** empuje físico, colocación correcta, rebote en el contenedor equivocado, activación de las 4 válvulas, aclarado progresivo del pantano, portal, tarjeta final e insignia. 12 draw calls, ~10.300 triángulos.
+
+## Fase 2 · Isla de la Sorpresa (implementada)
+
+`src/minigames/surprise/SurpriseObserveGame.js` · primera persona · verbo **observar**.
+
+- Un jardín circular con 12 figuras sobre pedestales y una fuente central como referencia.
+- Cada pocos segundos **algo cambia a tu espalda**: la comprobación usa el frustum real de la cámara, así que **nunca cambia nada que estés mirando**. Los cambios son color, tamaño, altura, giro o un elemento nuevo.
+- Hay que darse cuenta y **acercarse a la figura** para señalarla con `[E]`. Señalar la equivocada solo devuelve un sonido suave: sin cronómetro y sin castigo.
+- Detectar los 5 cambios despierta el jardín y abre el portal.
+
+**Verificado:** los cambios solo ocurren fuera de vista, detección correcta, señalar mal no penaliza, portal, tarjeta final e insignia. 12 draw calls, ~8.100 triángulos.
+
+---
+
+# Checklist de verificación (Fase 12-13)
+
+## Por isla
+
+| Comprobación | Enojo | Miedo | Tristeza | Alegría | Asco | Sorpresa |
+|---|:--:|:--:|:--:|:--:|:--:|:--:|
+| Carga sin errores de consola | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| El personaje se mueve, salta y corre | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Cámara + Pointer Lock liberado con ESC | ✅ | ✅ | ✅ (3ª p.) | ✅ (3ª p.) | ✅ | ✅ |
+| Colisiones y límites del mapa | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Interacciones con prompt `[E]` | ✅ | ✅ | ✅ | contacto | ✅ | ✅ |
+| Se puede completar | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Fallar es recuperable y no castiga | ✅ | ✅ | — | ✅ | ✅ | ✅ |
+| Reiniciar sin recargar la página | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Salir desbloquea lo que corresponde | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Sin arrastre de estado entre islas | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `dispose()` sin crecimiento de memoria | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+Medidas por isla (tras 40 frames, escritorio):
+
+| Isla | draw calls | triángulos | geometrías | texturas |
+|---|--:|--:|--:|--:|
+| Enojo | 31 | 12.391 | 32 | 1 |
+| Miedo | 14 | 14.840 | 14 | 0 |
+| Tristeza | 29 | 12.886 | 38 | 2 |
+| Alegría | 42 | 11.426 | 30 | 2 |
+| Asco | 29 | 11.124 | 33 | 5 |
+| Sorpresa | 12 | 8.136 | 30 | 1 |
+
+Montar y liberar cada isla dos o tres veces seguidas no aumenta geometrías ni texturas, y no deja canvas ni nodos huérfanos.
+
+## Global
+
+- Navegación, menús, caja de herramientas, progreso, insignias y guardado en `localStorage`: funcionan igual que antes.
+- **Táctil**: joystick virtual izquierdo, arrastre derecho para la cámara y botones flotantes de saltar/interactuar. Probado a 375×812: el joystick movió al jugador 5,3 m y la HUD no tapa el escenario.
+- **Build**: `python scripts/build-docs.py` genera `/docs` (equivalente a `pnpm build` de vite, que sigue funcionando donde haya Node).
+
+## Adaptaciones declaradas
+
+1. **Sin Node en la máquina**: el build de producción se hace con `scripts/build-docs.py`. `pnpm install/dev/build` no se pudo ejecutar aquí.
+2. **stats.js** no está disponible sin instalar dependencias: hay un medidor propio equivalente (FPS, draw calls, triángulos, geometrías y texturas) que se activa con **F3**.
+3. **Audio sin archivos**: todos los sonidos se generan por código y se cachean como `AudioBuffer`; los del mundo usan `THREE.PositionalAudio`.
+4. **Los minijuegos 2D anteriores no se han borrado**: siguen registrados en `src/minigames/index.js` (`fear-island`, `joy-valley`, `disgust-guardians`, `guided-breathing`) por si quieres volver a ellos, pero ninguna isla los usa.
+5. El contenido psicoeducativo (herramientas, insignias, intensidad, reevaluación) se conserva y se entrega en la **tarjeta final opcional** de cada isla, fuera del camino crítico del juego.

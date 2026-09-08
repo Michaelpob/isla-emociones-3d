@@ -106,9 +106,11 @@ export const islands = [
   {
     id: 'surprise',
     name: 'Sorpresa',
-    displayName: 'Isla de la Sorpresa',
-    emoji: '🎆',
-    subtitle: 'Isla en construccion.',
+    displayName: 'El jardin que cambia',
+    emoji: '✨',
+    subtitle: 'Algo cambia cuando no miras. Date cuenta y acercate.',
+    badge: 'Guardian de la Sorpresa',
+    reward: 'Estrella de Atencion',
     palette: {
       land: '#e8a0d0',
       accent: '#c060a0',
@@ -119,7 +121,7 @@ export const islands = [
     position: [3.5, 0, 2],
     radius: 1.18,
     height: 0.36,
-    minigame: 'coming-soon'
+    minigame: 'surprise-observe'
   }
 ];
 
@@ -129,6 +131,7 @@ export const minigameLabels = {
   'sadness-restore': 'El mundo que vuelve',
   'joy-orbs': 'Valle de la Luz',
   'disgust-sort': 'Guardianes del Desagrado',
+  'surprise-observe': 'El jardin que cambia',
   'fear-island': 'Isla del Miedo',
   'joy-valley': 'Valle de la Luz',
   'disgust-guardians': 'Guardianes del Desagrado',

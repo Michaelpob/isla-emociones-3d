@@ -1,7 +1,7 @@
-import { islands, minigameLabels } from '../data/islands.js?v=20260908174459';
-import { WorldScene } from '../three/WorldScene.js?v=20260908174459';
-import { minigameRegistry } from '../minigames/index.js?v=20260908174459';
-import { getPlayer, savePlayer, hasPlayer, avatars, favoriteColors } from '../data/player.js?v=20260908174459';
+import { islands, minigameLabels } from '../data/islands.js?v=20260908175209';
+import { WorldScene } from '../three/WorldScene.js?v=20260908175209';
+import { minigameRegistry } from '../minigames/index.js?v=20260908175209';
+import { getPlayer, savePlayer, hasPlayer, avatars, favoriteColors } from '../data/player.js?v=20260908175209';
 import {
   gameState,
   loadProgress,
@@ -11,9 +11,9 @@ import {
   allIslandsCompleted,
   addReward,
   ISLAND_CHAIN
-} from '../data/gameState.js?v=20260908174459';
-import { BADGES } from '../data/tools.js?v=20260908174459';
-import { openToolbox, openProgress, openFinal } from './screens.js?v=20260908174459';
+} from '../data/gameState.js?v=20260908175209';
+import { BADGES } from '../data/tools.js?v=20260908175209';
+import { openToolbox, openProgress, openFinal } from './screens.js?v=20260908175209';
 
 const ISLAND_NAMES = {
   fear: 'Isla del Miedo',

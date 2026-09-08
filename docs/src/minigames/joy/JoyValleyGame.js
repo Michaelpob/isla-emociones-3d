@@ -6,21 +6,21 @@
 // Regla especial: la alegria NO tiene que disminuir. Puede mantenerse,
 // modularse o bajar segun el contexto. Nunca se penaliza una eleccion.
 
-import { Stage, ABORTED } from '../../engine/Stage.js?v=20260908174459';
+import { Stage, ABORTED } from '../../engine/Stage.js?v=20260908175209';
 import {
   signalMirror,
   sequenceActivity,
   intensityThermometer,
   alternativeStrategyNotice,
   reevaluationScreen
-} from '../../engine/activities.js?v=20260908174459';
+} from '../../engine/activities.js?v=20260908175209';
 import {
   completeActivity,
   setInitialIntensity,
   setStrategy,
   recordReevaluation,
   gameState
-} from '../../data/gameState.js?v=20260908174459';
+} from '../../data/gameState.js?v=20260908175209';
 
 export class JoyValleyGame {
   constructor({ host, island, player, onComplete, onExit, onOpenToolbox }) {
