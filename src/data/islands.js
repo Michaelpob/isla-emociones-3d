@@ -64,7 +64,7 @@ export const islands = [
     name: 'Miedo',
     displayName: 'Isla del Miedo',
     emoji: '🌫️',
-    subtitle: 'Atraviesa la niebla: reconoce el miedo y aprende a avanzar con el.',
+    subtitle: 'Bosque a oscuras: enciende los faroles antes de quedarte sin luz.',
     chapter: 1,
     badge: 'Guardian del Miedo',
     reward: 'Lupa de la Realidad',
@@ -78,7 +78,7 @@ export const islands = [
     position: [-3.5, 0, 2],
     radius: 1.3,
     height: 0.38,
-    minigame: 'fear-island'
+    minigame: 'fear-night'
   },
   {
     id: 'disgust',
@@ -123,6 +123,7 @@ export const islands = [
 
 export const minigameLabels = {
   'anger-volcano': 'Volcan de las Emociones',
+  'fear-night': 'Bosque de la Noche',
   'fear-island': 'Isla del Miedo',
   'joy-valley': 'Valle de la Luz',
   'disgust-guardians': 'Guardianes del Desagrado',

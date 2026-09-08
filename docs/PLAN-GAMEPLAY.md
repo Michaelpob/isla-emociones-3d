@@ -83,7 +83,7 @@ Escena Three.js del archipiélago: renderer con ACES + sombras PCF, cielo con gr
 |---|---|
 | 0 · Auditoría | ✅ este documento |
 | 1 · Núcleo 3D compartido | ✅ `PlayerController` · `Interactable` · `MinigameBase` · `Feedback` · `AudioBus` · `worldkit` |
-| 2 · Una mecánica por isla | 🔵 Enojo ✅ · Miedo ⏳ · Tristeza ⏳ · Alegría ⏳ · Asco ⏳ · Sorpresa ⏳ |
+| 2 · Una mecánica por isla | 🔵 Enojo ✅ · Miedo ✅ · Tristeza ⏳ · Alegría ⏳ · Asco ⏳ · Sorpresa ⏳ |
 | 3 · UI, feedback y progreso | ✅ para las islas 3D ya migradas |
 | 4 · Transiciones y cierre | ✅ portal físico + tarjeta final opcional |
 | 5 · Audio | ✅ capas sintetizadas + PositionalAudio + ducking |
@@ -114,3 +114,17 @@ Escena Three.js del archipiélago: renderer con ACES + sombras PCF, cielo con gr
 - Recompensa: Gota de Calma + insignia Guardián de la Ira. La explicación psicoeducativa está en la tarjeta final, que se puede leer o saltar.
 
 **Verificado:** gravedad y aterrizaje, movimiento, colisión contra el cono del volcán, límites del mapa, chip `[E]`, rotura y reintento de la respiración, los 4 focos, apertura del portal, cierre completo con insignia y desbloqueo, y `dispose()` sin fugas (3 ciclos montar/liberar: 30 geometrías, 1 textura, 7 programas y 29 draw calls idénticos, 0 canvas huérfanos).
+
+
+## Fase 2 · Isla del Miedo (implementada)
+
+`src/minigames/fear/FearNightGame.js` · primera persona · verbo **explorar en la oscuridad**.
+
+- **Linterna con batería** montada en la cámara. Correr la gasta ~3,4× más rápido que caminar (medido: 0,186 vs 0,054 en 3 s); detenerse y mantener pulsado activa la respiración y la recarga. Con poca batería la luz parpadea.
+- **Quedarse a oscuras no es perder**: el bosque se apaga, aparece `PÁRATE Y RESPIRA`, el jugador va más lento y basta respirar para recuperar la luz. Sin pantalla de fallo.
+- **5 faroles** repartidos por el bosque; cada uno encendido aclara la niebla, sube la luz ambiental y devuelve algo de batería.
+- **Sustos suaves**: cada 16-30 s una silueta cruza a media distancia, con un sonido grave y un temblor mínimo; aparece y se desvanece sola. Nunca salta encima ni bloquea.
+- Con los 5 faroles **amanece**: la niebla se abre, el cielo vira a naranja y se abre el portal.
+- 150 árboles en dos `InstancedMesh` (tronco y copa) + 260 matas: 12 draw calls, ~14.800 triángulos.
+
+**Verificado:** aterrizaje, gasto y recarga de batería, estado de oscuridad y recuperación, colisión contra troncos (el jugador se detiene a 0,8 m), los 5 faroles, amanecer, portal, tarjeta final e insignia.

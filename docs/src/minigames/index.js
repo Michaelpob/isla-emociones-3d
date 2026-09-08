@@ -5,10 +5,12 @@ import { FearIslandGame } from './fear/FearIslandGame.js';
 import { JoyValleyGame } from './joy/JoyValleyGame.js';
 import { DisgustGuardiansGame } from './disgust/DisgustGuardiansGame.js';
 import { AngerVolcanoGame } from './anger/AngerVolcanoGame.js';
+import { FearNightGame } from './fear/FearNightGame.js';
 
 export const minigameRegistry = {
   // Islas 3D jugables
   'anger-volcano': AngerVolcanoGame,
+  'fear-night': FearNightGame,
   // EMO-AVENTURA (2D, en migracion a 3D)
   'fear-island': FearIslandGame,
   'joy-valley': JoyValleyGame,
