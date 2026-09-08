@@ -1115,4 +1115,4 @@ import{G as _,M as g,T as Se,a as T,C,b as v,c as Ye,S as We,d as Xe,e as Z,O as
           <button class="secondary-action" type="button" data-toolbox>Mi caja</button>
         </div>
       </section>
-    `,this.overlayRoot.querySelector("[data-toolbox]").addEventListener("click",()=>Ne(this.root)),this.overlayRoot.querySelector("[data-back-map]").addEventListener("click",()=>{i?(Js(this.root,()=>this.showMap()),this.world.setCompleted(new Set(L))):this.showMap()})}}const ei=document.querySelector("#app"),xa=new Ks(ei);xa.start();window.emoAventura=xa;fetch("https://abacus.jasoncameron.dev/hit/michaelpob-isla-emociones-3d",{cache:"no-store"}).catch(()=>{});
+    `,this.overlayRoot.querySelector("[data-toolbox]").addEventListener("click",()=>Ne(this.root)),this.overlayRoot.querySelector("[data-back-map]").addEventListener("click",()=>{i?(Js(this.root,()=>this.showMap()),this.world.setCompleted(new Set(L))):this.showMap()})}}const ei=document.querySelector("#app"),xa=new Ks(ei);xa.start();window.emoAventura=xa;fetch("https://abacus.jasoncameron.dev/hit/michaelpob-isla-emociones-3d",{mode:"no-cors",cache:"no-store"}).catch(()=>{});
