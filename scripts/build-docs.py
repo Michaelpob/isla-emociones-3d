@@ -45,9 +45,17 @@ def resolve_addons():
 
 
 def build():
+    # La documentacion escrita a mano (PLAN-GAMEPLAY.md, etc.) vive en docs/
+    # junto al build: se conserva entre reconstrucciones.
+    keep = {}
     if os.path.isdir(DOCS):
+        for name in os.listdir(DOCS):
+            if name.lower().endswith('.md'):
+                keep[name] = io.open(os.path.join(DOCS, name), encoding='utf-8').read()
         shutil.rmtree(DOCS)
     os.makedirs(DOCS)
+    for name, content in keep.items():
+        io.open(os.path.join(DOCS, name), 'w', encoding='utf-8', newline='\n').write(content)
 
     shutil.copytree(SRC, os.path.join(DOCS, 'src'))
 

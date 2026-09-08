@@ -43,7 +43,7 @@ export const islands = [
     name: 'Enojo',
     displayName: 'Volcan de las Emociones',
     emoji: '🔥',
-    subtitle: 'Sigue el ritmo del circulo y respira para calmar el enojo.',
+    subtitle: 'El volcan se agita. Llega a los focos y sosten la respiracion.',
     chapter: 3,
     badge: 'Guardian de la Ira',
     reward: 'Gota de Calma',
@@ -57,7 +57,7 @@ export const islands = [
     position: [3.5, 0, -3],
     radius: 1.4,
     height: 0.48,
-    minigame: 'guided-breathing'
+    minigame: 'anger-volcano'
   },
   {
     id: 'fear',
@@ -122,6 +122,7 @@ export const islands = [
 ];
 
 export const minigameLabels = {
+  'anger-volcano': 'Volcan de las Emociones',
   'fear-island': 'Isla del Miedo',
   'joy-valley': 'Valle de la Luz',
   'disgust-guardians': 'Guardianes del Desagrado',

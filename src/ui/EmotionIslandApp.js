@@ -393,6 +393,7 @@ export class EmotionIslandApp {
     const Game = minigameRegistry[island.minigame] ?? minigameRegistry['coming-soon'];
     this.state = 'game';
     this.overlayRoot.innerHTML = '';
+    this.world.setPaused(true);
     this.currentMinigame = new Game({
       host: this.overlayRoot,
       island,
@@ -407,12 +408,14 @@ export class EmotionIslandApp {
   exitMinigame() {
     this.currentMinigame?.dispose();
     this.currentMinigame = null;
+    this.world.setPaused(false);
     this.showMap();
   }
 
   showResult(result) {
     this.currentMinigame?.dispose();
     this.currentMinigame = null;
+    this.world.setPaused(false);
     let unlockedId = null;
     if (result.success) {
       this.completed.add(result.islandId);

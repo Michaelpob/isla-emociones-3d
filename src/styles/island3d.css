@@ -1,0 +1,325 @@
+/* Islas 3D · HUD minima y diegetica
+   Nunca tapa el centro, nunca supera ~15% de la pantalla.
+   Texto: 3-5 palabras como maximo. Las explicaciones van en la tarjeta final. */
+
+.i3d {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #0a0f14;
+  font-family: 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  color: #fff;
+  user-select: none;
+  touch-action: none;
+  pointer-events: auto;
+}
+
+.i3d__canvas,
+.i3d__canvas canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ------------------------------------------------------------------ HUD */
+
+.i3d__hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+.i3d__hud > * { pointer-events: auto; }
+
+.i3d__btn {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  background: rgba(8, 16, 22, 0.55);
+  color: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: transform 140ms ease, background 200ms ease;
+}
+.i3d__btn:hover { background: rgba(8, 16, 22, 0.8); transform: translateY(-1px); }
+.i3d__btn:active { transform: scale(0.95); }
+
+/* objetivo: ● ● ● ○ ○ */
+.i3d__objective {
+  position: absolute;
+  top: 18px;
+  right: 16px;
+  display: flex;
+  gap: 7px;
+  font-size: 1.05rem;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.65);
+}
+.i3d__objective i {
+  font-style: normal;
+  color: rgba(255, 255, 255, 0.32);
+  transition: color 320ms ease, transform 320ms ease;
+}
+.i3d__objective i.is-on {
+  color: #ffd166;
+  transform: scale(1.18);
+  text-shadow: 0 0 12px rgba(255, 209, 102, 0.8);
+}
+
+/* barras pequenas: bateria, respiracion, combo */
+.i3d__bars {
+  position: absolute;
+  left: 16px;
+  bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.i3d-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(8, 16, 22, 0.5);
+  backdrop-filter: blur(4px);
+}
+.i3d-bar[hidden] { display: none; }
+.i3d-bar__icon { font-size: 0.9rem; line-height: 1; }
+.i3d-bar__track {
+  display: block;
+  width: 92px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+.i3d-bar__track i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: 999px;
+  background: var(--c, #ffd166);
+  transition: width 160ms linear;
+}
+
+/* chip [E] Interactuar */
+.i3d-prompt {
+  position: absolute;
+  left: 50%;
+  bottom: 20%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(8, 16, 22, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  font-size: 0.86rem;
+  backdrop-filter: blur(4px);
+  animation: i3d-pop 220ms ease;
+  pointer-events: none;
+}
+.i3d-prompt kbd {
+  display: grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: #fff;
+  color: #10202c;
+  font: 700 0.78rem/1 inherit;
+}
+.i3d-prompt__icon { font-size: 1rem; }
+.i3d-prompt[hidden] { display: none; }
+
+/* texto brevisimo en el centro */
+.i3d__center {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 34%;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 5;
+}
+.i3d-flash {
+  margin: 0;
+  padding: 8px 18px;
+  border-radius: 14px;
+  background: rgba(8, 16, 22, 0.45);
+  font-size: clamp(1rem, 3.4vw, 1.6rem);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.7);
+  animation: i3d-pop 260ms ease;
+}
+
+/* mira central discreta (primera persona) */
+.i3d--fp .i3d__hud::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+}
+
+/* ------------------------------------------------------------- tactiles */
+
+.i3d__touch {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+.i3d__touch[hidden] { display: none; }
+.i3d__stick {
+  position: absolute;
+  left: 22px;
+  bottom: 22px;
+  width: 118px;
+  height: 118px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+  touch-action: none;
+}
+.i3d__stick i {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.34);
+  transition: transform 60ms linear;
+}
+.i3d__buttons {
+  position: absolute;
+  right: 20px;
+  bottom: 26px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  pointer-events: auto;
+}
+.i3d__tbtn {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(8, 16, 22, 0.5);
+  color: #fff;
+  font: 700 1.1rem/1 inherit;
+  cursor: pointer;
+  touch-action: none;
+}
+.i3d__tbtn--main {
+  width: 78px;
+  height: 78px;
+  background: rgba(245, 165, 36, 0.85);
+  color: #2b1a02;
+  font-size: 1.3rem;
+}
+.i3d__tbtn:active { transform: scale(0.94); }
+
+/* --------------------------------------------------------------- paneles */
+
+.i3d__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.i3d__overlay:empty { display: none; }
+.i3d__overlay > * { pointer-events: auto; }
+
+.i3d-panel {
+  width: min(460px, calc(100% - 32px));
+  padding: 22px;
+  border-radius: 20px;
+  background: rgba(10, 18, 26, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  animation: i3d-pop 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.i3d-panel h3 { margin: 0 0 12px; font-size: 1.25rem; }
+.i3d-panel p { margin: 0 0 10px; line-height: 1.55; color: rgba(255, 255, 255, 0.86); }
+.i3d-panel__actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+.i3d-panel__hint { margin-top: 14px; font-size: 0.78rem; color: rgba(255, 255, 255, 0.55); }
+.i3d-panel--card { max-height: 80vh; overflow-y: auto; text-align: left; }
+.i3d-panel--card h3 { text-align: center; }
+
+.i3d-btn {
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font: 700 0.95rem/1 inherit;
+  cursor: pointer;
+  transition: transform 140ms ease, background 200ms ease;
+}
+.i3d-btn:hover { background: rgba(255, 255, 255, 0.16); transform: translateY(-1px); }
+.i3d-btn--primary { background: linear-gradient(180deg, #f5a524, #d98614); border-color: transparent; color: #2b1a02; }
+
+.i3d-stats {
+  position: absolute;
+  left: 14px;
+  top: 64px;
+  z-index: 9;
+  padding: 5px 9px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  font: 500 0.72rem/1.4 ui-monospace, monospace;
+  color: #9ef29e;
+  pointer-events: none;
+}
+
+:where(.i3d button):focus-visible {
+  outline: 3px solid #ffd166;
+  outline-offset: 3px;
+}
+
+@keyframes i3d-pop {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ------------------------------------------------------------ responsive */
+
+@media (max-width: 720px) {
+  .i3d__objective { top: 14px; right: 12px; font-size: 0.95rem; }
+  .i3d__bars { left: 12px; bottom: 150px; }
+  .i3d-bar__track { width: 74px; }
+  .i3d-prompt { bottom: 27%; font-size: 0.8rem; }
+  .i3d__btn { top: 10px; left: 10px; }
+  .i3d-flash { font-size: 1.05rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .i3d *, .i3d *::before, .i3d *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 90ms !important;
+  }
+}

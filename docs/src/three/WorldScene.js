@@ -650,8 +650,18 @@ export class WorldScene {
     }
   };
 
+  /** Pausa el hub mientras se juega una isla (ahorra GPU) */
+  setPaused(paused) {
+    const wasPaused = this.paused;
+    this.paused = paused;
+    if (wasPaused && !paused && this.isRunning) {
+      this.clock.getDelta();
+      requestAnimationFrame(this.animate);
+    }
+  }
+
   animate = () => {
-    if (!this.isRunning) return;
+    if (!this.isRunning || this.paused) return;
     const delta = Math.min(this.clock.getDelta(), 0.033);
     const elapsed = this.clock.elapsedTime;
     const soft = 1 - Math.exp(-delta * 9);

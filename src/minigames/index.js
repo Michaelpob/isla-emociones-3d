@@ -4,9 +4,12 @@ import { ComingSoonGame } from './ComingSoonGame.js';
 import { FearIslandGame } from './fear/FearIslandGame.js';
 import { JoyValleyGame } from './joy/JoyValleyGame.js';
 import { DisgustGuardiansGame } from './disgust/DisgustGuardiansGame.js';
+import { AngerVolcanoGame } from './anger/AngerVolcanoGame.js';
 
 export const minigameRegistry = {
-  // EMO-AVENTURA
+  // Islas 3D jugables
+  'anger-volcano': AngerVolcanoGame,
+  // EMO-AVENTURA (2D, en migracion a 3D)
   'fear-island': FearIslandGame,
   'joy-valley': JoyValleyGame,
   'disgust-guardians': DisgustGuardiansGame,
