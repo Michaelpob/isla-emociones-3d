@@ -14,10 +14,14 @@ solo reintento.
 ## Ejecutar
 
 ```bash
-pnpm install && pnpm dev          # con Node
-python scripts/build-docs.py      # build sin Node -> /docs (GitHub Pages)
-python -m http.server 8000 -d docs
+pnpm install
+pnpm dev        # servidor de desarrollo con recarga en caliente (localhost:5173)
+pnpm build      # build de produccion -> /docs (lo que publica GitHub Pages)
+pnpm preview    # compila y sirve el build
 ```
+
+Si en alguna maquina no hay Node, `python scripts/build-docs.py` genera un
+`/docs` equivalente (importmap + three copiado de `node_modules`), sin minificar.
 
 Controles: **WASD** moverse · **SHIFT** correr · **SPACE** saltar · **E**
 interactuar (mantener pulsado donde toque) · **ESC** pausa · **F3** medidor de

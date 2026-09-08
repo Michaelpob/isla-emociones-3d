@@ -22,6 +22,12 @@ export default defineConfig({
   build: {
     outDir: 'docs',
     emptyOutDir: true,
-    assetsDir: 'assets'
+    assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        // three cambia rara vez: en su propio chunk se cachea entre versiones
+        manualChunks: { three: ['three'] }
+      }
+    }
   }
 });

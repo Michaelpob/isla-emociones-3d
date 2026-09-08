@@ -8,8 +8,7 @@
 
 | Comprobación | Resultado |
 |---|---|
-| `pnpm install` / `pnpm dev` | **No ejecutable en esta máquina**: no hay Node instalado (no aparece en PATH, ni en el registro de programas, ni existe `node.exe`). `pnpm-lock.yaml` y `node_modules/` sí existen (three 0.179.1 disponible). |
-| Alternativa usada | `python scripts/build-docs.py` genera `docs/` sin Node (importmap + three copiado de `node_modules`) y `python -m http.server -d docs` sirve el sitio. |
+| `pnpm install` / `pnpm dev` | ✅ **Node 24.19.0 instalado durante el trabajo.** `pnpm dev` levanta el servidor de vite con recarga en caliente; `pnpm build` genera el `/docs` de produccion. Antes de instalarlo se usó `scripts/build-docs.py` (sigue disponible como alternativa sin Node). |
 | Arranque sin errores | **Sí.** Consola limpia salvo el contador de visitas externo (`abacus.jasoncameron.dev`), que da CORS al servir desde `127.0.0.1` y funciona en el dominio real. |
 | Flujo completo recorrido | menú → perfil → mapa 3D → isla (bloqueada / disponible) → minijuego → salida → desbloqueo → caja de herramientas / progreso / final. Todo funciona. |
 
@@ -233,3 +232,30 @@ Montar y liberar cada isla dos o tres veces seguidas no aumenta geometrías ni t
 3. **Audio sin archivos**: todos los sonidos se generan por código y se cachean como `AudioBuffer`; los del mundo usan `THREE.PositionalAudio`.
 4. **Los minijuegos 2D anteriores no se han borrado**: siguen registrados en `src/minigames/index.js` (`fear-island`, `joy-valley`, `disgust-guardians`, `guided-breathing`) por si quieres volver a ellos, pero ninguna isla los usa.
 5. El contenido psicoeducativo (herramientas, insignias, intensidad, reevaluación) se conserva y se entrega en la **tarjeta final opcional** de cada isla, fuera del camino crítico del juego.
+
+---
+
+# Fase 14 · Build de produccion con Node
+
+Node 24.19.0 + pnpm 12.3.4 (via corepack) quedaron operativos a mitad del trabajo:
+
+| | Antes (build sin Node) | Ahora (`pnpm build`) |
+|---|---|---|
+| JS | ~968 kB sin minificar, en 30+ ficheros | **296 kB** (app) + **509 kB** (three), minificados |
+| Gzip | — | **83 kB** + **128 kB** |
+| CSS | 8 hojas sin minificar | **84 kB** minificado (17 kB gzip) |
+| Cache | sello `?v=` a mano | hash en el nombre del fichero |
+
+- `three` va en su propio chunk (`manualChunks`): cambia rara vez, así que al
+  actualizar el juego el navegador solo se vuelve a bajar los 83 kB de la app.
+- `pnpm dev` da recarga en caliente: editar y ver el cambio sin reconstruir.
+- `.claude/launch.json` apunta al vite local, así que el servidor de desarrollo
+  se levanta directamente desde el editor.
+- Verificado sobre el bundle **minificado**: la Isla de la Alegría carga, recoge
+  orbes y suma objetivo (37 draw calls, ~11.100 triángulos), sin errores de
+  consola más allá del contador de visitas externo.
+
+**Sigue pendiente de medir:** FPS sostenidos en gama media. El navegador de
+pruebas de este entorno no ejecuta `requestAnimationFrame`, así que las medidas
+son de draw calls, triángulos y memoria. Con el juego abierto en un navegador
+normal, **F3** muestra los FPS reales.
