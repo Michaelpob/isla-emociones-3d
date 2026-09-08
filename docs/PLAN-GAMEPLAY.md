@@ -83,7 +83,7 @@ Escena Three.js del archipiélago: renderer con ACES + sombras PCF, cielo con gr
 |---|---|
 | 0 · Auditoría | ✅ este documento |
 | 1 · Núcleo 3D compartido | ✅ `PlayerController` · `Interactable` · `MinigameBase` · `Feedback` · `AudioBus` · `worldkit` |
-| 2 · Una mecánica por isla | 🔵 Enojo ✅ · Miedo ✅ · Tristeza ✅ · Alegría ✅ · Asco ⏳ · Sorpresa ⏳ |
+| 2 · Una mecánica por isla | 🔵 Enojo ✅ · Miedo ✅ · Tristeza ✅ · Alegría ✅ · Asco ✅ · Sorpresa ⏳ |
 | 3 · UI, feedback y progreso | ✅ para las islas 3D ya migradas |
 | 4 · Transiciones y cierre | ✅ portal físico + tarjeta final opcional |
 | 5 · Audio | ✅ capas sintetizadas + PositionalAudio + ducking |
@@ -162,3 +162,16 @@ Tristeza y Sorpresa tienen ahora insignia propia (Guardián de la Tristeza 💧,
 - La lectura psicoeducativa es la contraria a "bajar" la emoción: aquí la alegría se usa como impulso y llega más lejos.
 
 **Verificado:** salto y aterrizaje sobre plataforma (y = 1,80 exacto), recogida por contacto, combo en el aire (11 encadenados en la prueba), crecimiento de vegetación, 4 capas de audio, portal, tarjeta final e insignia.
+
+## Fase 2 · Guardianes del Desagrado / Asco (implementada)
+
+`src/minigames/disgust/DisgustSortGame.js` · primera persona · verbo **manipular y ordenar**.
+
+- Cuatro zonas del pantano (Olores, Sabores, Imágenes, Rechazo), cada una con **dos contenedores** (🚫 descartar / 💚 conservar) y **tres objetos**.
+- Los objetos **se empujan con el cuerpo**: no hay botón de recoger. La fuerza del empuje depende de la velocidad del jugador, hay rozamiento y los objetos ruedan. En la prueba, caminar contra un objeto lo desplazó 8,2 m hasta el contenedor.
+- **Contenedor equivocado = sin castigo**: el objeto sale rebotado con un sonido suave y unas partículas, y se puede volver a intentar. Nunca aparece un texto de error.
+- Con los tres objetos ordenados se enciende la **válvula** de la zona; activarla con `[E]` aclara el agua estancada, sube la luz y abre la niebla un paso.
+- Las cuatro zonas limpias abren el portal.
+- Cada zona incluye a propósito **algo que merece conservarse**: cuando el rechazo lo ocupa todo, también se tira lo bueno.
+
+**Verificado:** empuje físico, colocación correcta, rebote en el contenedor equivocado, activación de las 4 válvulas, aclarado progresivo del pantano, portal, tarjeta final e insignia. 12 draw calls, ~10.300 triángulos.

@@ -87,7 +87,7 @@ export const islands = [
     name: 'Desagrado',
     displayName: 'Guardianes del Desagrado',
     emoji: '🍃',
-    subtitle: 'Territorio de las sensaciones incomodas: sentir sin reaccionar de golpe.',
+    subtitle: 'Empuja y ordena lo que hay en las cuatro zonas del pantano.',
     chapter: 4,
     badge: 'Guardian del Desagrado',
     reward: 'Semilla de Aceptacion',
@@ -101,7 +101,7 @@ export const islands = [
     position: [0, 0, 3.5],
     radius: 1.2,
     height: 0.36,
-    minigame: 'disgust-guardians'
+    minigame: 'disgust-sort'
   },
   {
     id: 'surprise',
@@ -128,6 +128,7 @@ export const minigameLabels = {
   'fear-night': 'Bosque de la Noche',
   'sadness-restore': 'El mundo que vuelve',
   'joy-orbs': 'Valle de la Luz',
+  'disgust-sort': 'Guardianes del Desagrado',
   'fear-island': 'Isla del Miedo',
   'joy-valley': 'Valle de la Luz',
   'disgust-guardians': 'Guardianes del Desagrado',

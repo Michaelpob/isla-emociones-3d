@@ -8,6 +8,7 @@ import { AngerVolcanoGame } from './anger/AngerVolcanoGame.js';
 import { FearNightGame } from './fear/FearNightGame.js';
 import { SadnessRestoreGame } from './sadness/SadnessRestoreGame.js';
 import { JoyOrbsGame } from './joy/JoyOrbsGame.js';
+import { DisgustSortGame } from './disgust/DisgustSortGame.js';
 
 export const minigameRegistry = {
   // Islas 3D jugables
@@ -15,6 +16,7 @@ export const minigameRegistry = {
   'fear-night': FearNightGame,
   'sadness-restore': SadnessRestoreGame,
   'joy-orbs': JoyOrbsGame,
+  'disgust-sort': DisgustSortGame,
   // EMO-AVENTURA (2D, en migracion a 3D)
   'fear-island': FearIslandGame,
   'joy-valley': JoyValleyGame,

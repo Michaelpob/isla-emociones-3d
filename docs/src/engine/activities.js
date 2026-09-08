@@ -2,7 +2,7 @@
 // Cada funcion es un minijuego real: devuelve una promesa que se resuelve
 // cuando el jugador completa la interaccion. Ninguna resta puntos ni vidas.
 
-import { prefersReducedMotion } from '../data/gameState.js?v=20260908174045';
+import { prefersReducedMotion } from '../data/gameState.js?v=20260908174459';
 
 /* ============================================================ RESPIRACION */
 
