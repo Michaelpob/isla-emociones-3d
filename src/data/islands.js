@@ -4,7 +4,7 @@ export const islands = [
     name: 'Alegria',
     displayName: 'Isla de la Alegria',
     emoji: '🌈',
-    subtitle: 'Recolecta destellos de felicidad.',
+    subtitle: 'Isla en construccion.',
     palette: {
       land: '#f6c85f',
       accent: '#ff8a3d',
@@ -15,7 +15,7 @@ export const islands = [
     position: [-3.5, 0, -3],
     radius: 1.3,
     height: 0.4,
-    minigame: 'joy-stars'
+    minigame: 'coming-soon'
   },
   {
     id: 'sadness',
@@ -58,7 +58,7 @@ export const islands = [
     name: 'Miedo',
     displayName: 'Isla del Miedo',
     emoji: '🌑',
-    subtitle: 'Ilumina el camino y encuentra objetos ocultos.',
+    subtitle: 'Isla en construccion.',
     palette: {
       land: '#6c5a94',
       accent: '#403a67',
@@ -69,14 +69,14 @@ export const islands = [
     position: [-3.5, 0, 2],
     radius: 1.3,
     height: 0.38,
-    minigame: 'darkness-light'
+    minigame: 'coming-soon'
   },
   {
     id: 'disgust',
     name: 'Desagrado',
     displayName: 'Isla del Desagrado',
     emoji: '💚',
-    subtitle: 'Separa lo positivo de lo negativo.',
+    subtitle: 'Isla en construccion.',
     palette: {
       land: '#6ab86a',
       accent: '#3a8a3a',
@@ -87,14 +87,14 @@ export const islands = [
     position: [0, 0, 3.5],
     radius: 1.2,
     height: 0.36,
-    minigame: 'spirit-cleaning'
+    minigame: 'coming-soon'
   },
   {
     id: 'surprise',
     name: 'Sorpresa',
     displayName: 'Isla de la Sorpresa',
     emoji: '🎆',
-    subtitle: 'Atrapa las cajas sorpresa que aparecen.',
+    subtitle: 'Isla en construccion.',
     palette: {
       land: '#e8a0d0',
       accent: '#c060a0',
@@ -105,16 +105,12 @@ export const islands = [
     position: [3.5, 0, 2],
     radius: 1.18,
     height: 0.36,
-    minigame: 'surprise-boxes'
+    minigame: 'coming-soon'
   }
 ];
 
 export const minigameLabels = {
-  'joy-stars': 'Destellos en movimiento',
   'volcano-control': 'Control del Volcan',
   'guided-breathing': 'Respiracion Guiada',
-  'darkness-light': 'Luz en la Oscuridad',
-  'spirit-cleaning': 'Limpieza Espiritual',
-  'surprise-boxes': 'Cajas Sorpresa',
   'coming-soon': 'Prototipo listo para ampliar'
 };
