@@ -7,6 +7,7 @@ import { DisgustGuardiansGame } from './disgust/DisgustGuardiansGame.js';
 import { AngerVolcanoGame } from './anger/AngerVolcanoGame.js';
 import { FearNightGame } from './fear/FearNightGame.js';
 import { SadnessRestoreGame } from './sadness/SadnessRestoreGame.js';
+import { SadnessDaysGame } from './sadness/SadnessDaysGame.js';
 import { JoyOrbsGame } from './joy/JoyOrbsGame.js';
 import { DisgustSortGame } from './disgust/DisgustSortGame.js';
 import { SurpriseObserveGame } from './surprise/SurpriseObserveGame.js';
@@ -15,6 +16,7 @@ export const minigameRegistry = {
   // Islas 3D jugables
   'anger-volcano': AngerVolcanoGame,
   'fear-night': FearNightGame,
+  'sadness-days': SadnessDaysGame,
   'sadness-restore': SadnessRestoreGame,
   'joy-orbs': JoyOrbsGame,
   'disgust-sort': DisgustSortGame,

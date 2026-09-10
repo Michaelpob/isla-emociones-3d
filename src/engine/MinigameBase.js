@@ -112,7 +112,13 @@ export class MinigameBase {
   _initRenderer() {
     const coarse = window.matchMedia('(pointer: coarse)').matches;
     this.renderer = new THREE.WebGLRenderer({ antialias: !coarse, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, coarse ? 1.5 : 1.75));
+    // Resolucion adaptativa: si el equipo no llega a 30 fps se baja el buffer
+    // interno (el canvas sigue ocupando la pantalla) hasta recuperar fluidez.
+    this.basePixelRatio = Math.min(window.devicePixelRatio || 1, coarse ? 1.5 : 1.75);
+    this.qualityScale = 1;
+    this._qAcc = 0;
+    this._qFrames = 0;
+    this.renderer.setPixelRatio(this.basePixelRatio);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.shadowMap.autoUpdate = false;   // escenas estaticas: se refresca a mano
@@ -244,10 +250,36 @@ export class MinigameBase {
     }
     this.feedback.update(dt);
     this.renderer.render(this.scene, this.camera);
+    if (forcedDt === null) this.adaptQuality(dt);
     if (this._stats) this._updateStats(dt);
   }
 
   update(dt) { this.step(dt); }
+
+  /**
+   * Escalado dinamico de resolucion. Objetivo del proyecto: 60 fps en gama
+   * media y nunca por debajo de 30. Si el equipo no llega, se reduce el buffer
+   * interno antes que perder fluidez; cuando sobra margen, se recupera.
+   */
+  adaptQuality(dt) {
+    if (this.paused || dt <= 0) return;
+    this._qAcc += dt;
+    this._qFrames += 1;
+    if (this._qAcc < 1.2) return;
+    const fps = this._qFrames / this._qAcc;
+    this._qAcc = 0;
+    this._qFrames = 0;
+    const prev = this.qualityScale;
+    if (fps < 34 && this.qualityScale > 0.5) {
+      this.qualityScale = Math.max(0.5, this.qualityScale - 0.18);
+    } else if (fps > 55 && this.qualityScale < 1) {
+      this.qualityScale = Math.min(1, this.qualityScale + 0.08);
+    }
+    if (this.qualityScale !== prev) {
+      this.renderer.setPixelRatio(this.basePixelRatio * this.qualityScale);
+      this._resize();
+    }
+  }
 
   pause() { this.togglePause(true); }
   resume() { this.togglePause(false); }
@@ -498,7 +530,8 @@ export class MinigameBase {
       const info = this.renderer.info;
       this._stats.textContent =
         `${fps} fps · ${info.render.calls} draws · ${info.render.triangles} tris · ` +
-        `geo ${info.memory.geometries} · tex ${info.memory.textures}`;
+        `geo ${info.memory.geometries} · tex ${info.memory.textures} · ` +
+        `res ${Math.round(this.qualityScale * 100)}%`;
       this._statsAcc = 0;
       this._statsFrames = 0;
     }

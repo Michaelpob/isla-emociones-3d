@@ -23,9 +23,9 @@ export const islands = [
   {
     id: 'sadness',
     name: 'Tristeza',
-    displayName: 'El mundo que vuelve',
+    displayName: 'Un dia a la vez',
     emoji: '💧',
-    subtitle: 'Todo esta gris. Encuentra los fragmentos y devuelve el color.',
+    subtitle: 'Poca energia cada dia. Elige que haces con ella.',
     badge: 'Guardian de la Tristeza',
     reward: 'Cristal del Recuerdo Positivo',
     palette: {
@@ -38,7 +38,7 @@ export const islands = [
     position: [0, 0, -4.5],
     radius: 1.25,
     height: 0.34,
-    minigame: 'sadness-restore'
+    minigame: 'sadness-days'
   },
   {
     id: 'anger',
@@ -128,6 +128,7 @@ export const islands = [
 export const minigameLabels = {
   'anger-volcano': 'Volcan de las Emociones',
   'fear-night': 'Bosque de la Noche',
+  'sadness-days': 'Un dia a la vez',
   'sadness-restore': 'El mundo que vuelve',
   'joy-orbs': 'Valle de la Luz',
   'disgust-sort': 'Guardianes del Desagrado',

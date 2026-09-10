@@ -259,3 +259,55 @@ Node 24.19.0 + pnpm 12.3.4 (via corepack) quedaron operativos a mitad del trabaj
 pruebas de este entorno no ejecuta `requestAnimationFrame`, así que las medidas
 son de draw calls, triángulos y memoria. Con el juego abierto en un navegador
 normal, **F3** muestra los FPS reales.
+
+---
+
+# Fase 15 · Rediseño: un género por isla
+
+**Crítica que lo motiva:** las seis islas compartían el mismo bucle —ir a N
+puntos marcados, pulsar `E`, llenar un contador, abrir el portal—. Cambiaba la
+ambientación, el recurso y la cámara, pero no el juego. Los "verbos distintos"
+eran variaciones de *caminar hasta lo señalado e interactuar*.
+
+**Criterio nuevo:** cada isla es de un **género** distinto, con input, ritmo y
+forma de fallar propios. Tres de las seis dejan de ser juegos de caminar.
+
+| Isla | Género | Lo que se te exige | Cómo se "falla" | Estado |
+|---|---|---|---|---|
+| Miedo | Tensión continua | Administrar tu ritmo al acercarte | Retrocedes unos metros | ⏳ |
+| Ira | Reflejos + inhibición | Distinguir y contenerte | El volcán sube | ⏳ |
+| **Tristeza** | **Economía por turnos** | **Elegir en qué gastas la energía** | **Mañana sigues igual** | **✅** |
+| Alegría | Ritmo | Precisión temporal | Esa capa no entra | ⏳ |
+| Asco | Deducción | Buscar información antes de decidir | Descartas algo bueno | ⏳ |
+| Sorpresa | Memoria | Retener y comparar | Otra ronda | ⏳ |
+
+## Tristeza · «Un día a la vez» (implementada)
+
+`src/minigames/sadness/SadnessDaysGame.js` · **cámara fija, no se camina**.
+
+- Cámara de sobremesa sobre una casa y su jardín, con arrastre para girar la
+  vista. El jugador **no controla al personaje**: hace clic sobre las cosas y el
+  personaje va solo hasta ellas.
+- **Fichas de energía**: 3 el primer día. Cada acción cuesta 1 o 2 y cambia algo
+  visible (entra luz por la ventana, la planta crece una etapa, suena la radio,
+  humea la chimenea, el camino recupera color, alguien contesta al día
+  siguiente).
+- **La regla del juego:** al dormir, `energía de mañana = 2 + fichas gastadas
+  hoy` (mínimo 3, máximo 5). Quedarte quieto **no castiga** —te quedas con las
+  mismas 3—, pero la energía solo sube cuando actúas. Eso es activación
+  conductual: no esperar a tener ganas, hacer algo pequeño y dejar que las ganas
+  lleguen después.
+- Cuatro días. El escenario entero se va templando con lo que hiciste (cielo,
+  niebla, sol, hierba, colinas y el color del propio personaje). Al terminar, la
+  puerta de la casa se abre y se sale por ella.
+- Las esperas del juego van **por frames**, no por `setTimeout`: siguen siendo
+  exactas aunque el navegador frene los temporizadores.
+
+**Verificado:** clic real sobre un objeto (tooltip, realce y cursor), el
+personaje camina hasta el sitio, se gasta la ficha, el mundo cambia, el ciclo de
+los 4 días con la energía subiendo 3 → 5, la respuesta al mensaje llegando al
+día siguiente, la planta en sus 3 etapas, la puerta abriéndose y el cierre con
+insignia y herramienta. 31 draw calls, ~8.200 triángulos, sin errores de consola.
+
+El minijuego 3D anterior de Tristeza (`sadness-restore`, «El mundo que vuelve»)
+queda registrado pero fuera de la isla.

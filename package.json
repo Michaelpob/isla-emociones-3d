@@ -6,11 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite build && node scripts/serve-dist.mjs"
+    "preview": "vite build && node scripts/serve-dist.mjs",
+    "fps": "node scripts/measure-fps.mjs"
   },
   "dependencies": {
-    "vite": "^7.1.3",
-    "three": "^0.179.1"
+    "three": "^0.179.1",
+    "vite": "^7.1.3"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
 }

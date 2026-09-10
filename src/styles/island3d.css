@@ -323,3 +323,60 @@
     transition-duration: 90ms !important;
   }
 }
+
+/* ---------------------------------------- islas por turnos (Un dia a la vez) */
+
+.i3d-pick {
+  position: fixed;
+  transform: translate(-50%, -100%);
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(8, 16, 22, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  font-size: 0.84rem;
+  white-space: nowrap;
+  color: #fff;
+  pointer-events: none;
+  z-index: 7;
+}
+.i3d-pick[hidden] { display: none; }
+.i3d-pick b { color: #ffd166; letter-spacing: 0.14em; }
+.i3d-pick[data-off='true'] { opacity: 0.55; }
+.i3d-pick[data-off='true'] b { color: #ff9d8a; }
+
+.i3d-day {
+  position: absolute;
+  right: 16px;
+  bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: rgba(8, 16, 22, 0.55);
+  backdrop-filter: blur(4px);
+  text-align: right;
+}
+.i3d-day p { margin: 0; font-size: 0.86rem; color: #fff; }
+.i3d-day__label b { font-size: 1.05rem; }
+.i3d-day__energy b { color: #ffd166; letter-spacing: 0.2em; font-size: 1rem; }
+.i3d-day__sleep { margin-top: 4px; }
+.i3d-day__sleep[hidden] { display: none; }
+
+/* transicion de noche entre dias */
+.i3d-night {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #0b1626, #1b2a3a);
+  animation: i3d-night-in 900ms ease forwards;
+  pointer-events: none;
+}
+.i3d-night.is-out { animation: i3d-night-out 700ms ease forwards; }
+@keyframes i3d-night-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes i3d-night-out { from { opacity: 1; } to { opacity: 0; } }
+
+@media (max-width: 720px) {
+  .i3d-day { right: 10px; bottom: 12px; padding: 9px 12px; }
+  .i3d-day p { font-size: 0.78rem; }
+}
