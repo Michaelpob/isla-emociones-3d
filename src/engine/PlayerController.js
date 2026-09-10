@@ -106,30 +106,69 @@ export class PlayerController {
       this.emit('pointerlock', this.pointerLocked);
     };
 
-    // Arrastre: funciona en escritorio sin pointer lock y en tactil (lado derecho)
-    this._drag = { active: false, id: null, x: 0, y: 0 };
-    this._onPointerDown = (e) => {
-      if (!this.enabled) return;
-      if (e.pointerType !== 'touch' && this.pointerLocked) return;
-      // el joystick y los botones capturan su propio puntero, asi que aqui solo
-      // llegan los dedos libres: se puede mirar desde cualquier parte de la pantalla
-      if (e.pointerType === 'touch' && this._drag.active) return; // ya hay un dedo mirando
+    // Arrastre para mirar. Regla de oro: NUNCA puede quedarse enganchado.
+    // Un pointerup se puede perder (el navegador se lo traga, el nodo bajo el
+    // dedo desaparece, el sistema roba el gesto). Por eso el dedo que manda
+    // tiene fecha: si lleva STALE ms sin dar senales, esta muerto y cualquier
+    // otro puede tomar el mando. La camara se recupera sola en medio segundo.
+    const STALE = 600;
+    this._drag = { active: false, id: null, x: 0, y: 0, t: 0 };
+
+    const takeDrag = (e) => {
       this._drag.active = true;
       this._drag.id = e.pointerId;
       this._drag.x = e.clientX;
       this._drag.y = e.clientY;
+      this._drag.t = performance.now();
     };
+    const dropDrag = () => {
+      this._drag.active = false;
+      this._drag.id = null;
+    };
+    // hay un dedo vivo girando la camara y no es este
+    const busy = (e) =>
+      this._drag.active &&
+      this._drag.id !== e.pointerId &&
+      performance.now() - this._drag.t < STALE;
+    this._dropDrag = dropDrag;
+
+    this._onPointerDown = (e) => {
+      if (!this.enabled) return;
+      if (e.pointerType !== 'touch' && this.pointerLocked) return;
+      // isPrimary significa que no hay ningun otro dedo en la pantalla: si el
+      // arrastre anterior seguia "activo", era un fantasma. Se recupera al vuelo.
+      if (!e.isPrimary && busy(e)) return;   // un segundo dedo real no roba la camara
+      takeDrag(e);
+      // la captura garantiza que llegue el final del gesto aunque el dedo
+      // salga de la pantalla o el elemento de debajo se elimine
+      try { this.dom.setPointerCapture(e.pointerId); } catch { /* opcional */ }
+    };
+
     this._onPointerMove = (e) => {
-      if (!this._drag.active || e.pointerId !== this._drag.id) return;
+      if (!this.enabled) return;
+      if (e.pointerType !== 'touch' && this.pointerLocked) return;
+      // raton o lapiz sin boton pulsado (solo pasando por encima, o soltado
+      // fuera de la ventana): no es un arrastre
+      if (e.pointerType !== 'touch' && e.buttons === 0) { dropDrag(); return; }
+      if (this._drag.id !== e.pointerId) {
+        if (busy(e)) return;
+        takeDrag(e);                    // rescate: sin salto de camara, se empieza aqui
+        return;
+      }
       const dx = e.clientX - this._drag.x;
       const dy = e.clientY - this._drag.y;
       this._drag.x = e.clientX;
       this._drag.y = e.clientY;
+      this._drag.t = performance.now();
+      this._drag.active = true;
       const k = e.pointerType === 'touch' ? 0.0065 : 0.005;
       this.addLook(dx * k, dy * k);
     };
+
     this._onPointerUp = (e) => {
-      if (e.pointerId === this._drag.id) { this._drag.active = false; this._drag.id = null; }
+      if (!this._drag.active) return;
+      if (e && e.pointerId !== undefined && e.pointerId !== this._drag.id) return;
+      dropDrag();
     };
 
     // Perder el foco (cambiar de pestana, notificacion, llamada) dejaba teclas
@@ -140,17 +179,22 @@ export class PlayerController {
       this.touch.move.y = 0;
       this.touch.run = false;
       this.touch.runSince = null;
-      this._drag.active = false;
-      this._drag.id = null;
+      dropDrag();
     };
+    this._onVisibility = () => { if (document.hidden) this._onBlur(); };
 
     window.addEventListener('keydown', this._onKeyDown);
     window.addEventListener('keyup', this._onKeyUp);
     window.addEventListener('blur', this._onBlur);
     document.addEventListener('mousemove', this._onMouseMove);
     document.addEventListener('pointerlockchange', this._onPointerLockChange);
+    document.addEventListener('visibilitychange', this._onVisibility);
     this.dom.addEventListener('pointerdown', this._onPointerDown);
-    window.addEventListener('pointermove', this._onPointerMove);
+    this.dom.addEventListener('pointermove', this._onPointerMove);
+    this.dom.addEventListener('pointerup', this._onPointerUp);
+    this.dom.addEventListener('pointercancel', this._onPointerUp);
+    this.dom.addEventListener('lostpointercapture', this._onPointerUp);
+    // red de seguridad: si el gesto termina fuera del canvas, tambien cuenta
     window.addEventListener('pointerup', this._onPointerUp);
     window.addEventListener('pointercancel', this._onPointerUp);
   }
@@ -393,8 +437,12 @@ export class PlayerController {
     window.removeEventListener('blur', this._onBlur);
     document.removeEventListener('mousemove', this._onMouseMove);
     document.removeEventListener('pointerlockchange', this._onPointerLockChange);
+    document.removeEventListener('visibilitychange', this._onVisibility);
     this.dom.removeEventListener('pointerdown', this._onPointerDown);
-    window.removeEventListener('pointermove', this._onPointerMove);
+    this.dom.removeEventListener('pointermove', this._onPointerMove);
+    this.dom.removeEventListener('pointerup', this._onPointerUp);
+    this.dom.removeEventListener('pointercancel', this._onPointerUp);
+    this.dom.removeEventListener('lostpointercapture', this._onPointerUp);
     window.removeEventListener('pointerup', this._onPointerUp);
     window.removeEventListener('pointercancel', this._onPointerUp);
     this.exitPointerLock();

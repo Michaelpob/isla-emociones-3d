@@ -545,9 +545,12 @@ export class MinigameBase {
     const note = document.createElement('div');
     note.className = 'i3d-note';
     note.style.setProperty('--dur', `${seconds}s`);
+    // La tarjeta no intercepta el dedo: se lee mientras se sigue girando la
+    // camara. Solo la aspa cierra antes de tiempo.
     note.innerHTML = `
       ${title ? `<p class="i3d-note__title">${title}</p>` : ''}
       <p class="i3d-note__text">${text}</p>
+      <button class="i3d-note__x" type="button" aria-label="Cerrar">&times;</button>
       <span class="i3d-note__bar" aria-hidden="true"></span>
     `;
     this.el.notes.appendChild(note);
@@ -555,7 +558,7 @@ export class MinigameBase {
       note.classList.add('is-out');
       this.later(() => note.remove(), 300);
     };
-    note.addEventListener('click', close);
+    note.querySelector('.i3d-note__x').addEventListener('click', close);
     this.later(close, seconds * 1000);
     return note;
   }
