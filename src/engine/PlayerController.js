@@ -67,6 +67,10 @@ export class PlayerController {
     this.touch = { move: { x: 0, y: 0 }, look: { x: 0, y: 0 }, jump: false, interact: false, runSince: null };
     this.events = { jump: [], step: [], interact: [], land: [] };
     this.pointerLocked = false;
+    // El pointer lock es para el raton. En Android, pedirlo hace que Chrome
+    // muestre "para mostrar el cursor, cambia de app..." y capture la entrada:
+    // el juego se queda congelado. Basta con ver un dedo para descartarlo.
+    this.usingTouch = window.matchMedia?.('(pointer: coarse)').matches ?? false;
 
     this._bind();
   }
@@ -103,6 +107,10 @@ export class PlayerController {
 
     this._onPointerLockChange = () => {
       this.pointerLocked = document.pointerLockElement === this.dom;
+      if (this.pointerLocked && this.usingTouch) {
+        document.exitPointerLock?.();   // rescate: en tactil no se bloquea nunca
+        return;
+      }
       this.emit('pointerlock', this.pointerLocked);
     };
 
@@ -133,6 +141,7 @@ export class PlayerController {
     this._dropDrag = dropDrag;
 
     this._onPointerDown = (e) => {
+      if (e.pointerType === 'touch') this.usingTouch = true;
       if (!this.enabled) return;
       if (e.pointerType !== 'touch' && this.pointerLocked) return;
       // isPrimary significa que no hay ningun otro dedo en la pantalla: si el
@@ -207,7 +216,7 @@ export class PlayerController {
   }
 
   requestPointerLock() {
-    if (this.mode !== 'first') return;
+    if (this.mode !== 'first' || this.usingTouch) return;
     this.dom.requestPointerLock?.();
   }
 

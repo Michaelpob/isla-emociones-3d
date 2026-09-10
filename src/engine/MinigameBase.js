@@ -161,8 +161,10 @@ export class MinigameBase {
     window.addEventListener('keydown', onKey);
     this.listeners.push(() => window.removeEventListener('keydown', onKey));
 
-    const onCanvasClick = () => {
+    const onCanvasClick = (e) => {
       if (this.paused || this.finished) return;
+      // solo el raton bloquea el puntero: en tactil Chrome secuestra la entrada
+      if (e.pointerType && e.pointerType !== 'mouse') return;
       if (this.mode === 'first') this.controller.requestPointerLock();
     };
     this.renderer.domElement.addEventListener('click', onCanvasClick);
