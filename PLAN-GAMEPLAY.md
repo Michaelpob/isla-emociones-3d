@@ -349,3 +349,23 @@ La tarjeta se puede volver a abrir desde el menú de pausa con **Cómo se juega*
 pantalla completa —"Gira el teléfono"— con un icono que rota. Solo aparece en
 dispositivos táctiles, se puede descartar con *Seguir así* y desaparece solo al
 girar (escuchando el media query, `resize` y `orientationchange`).
+
+
+## Ajuste · Reflexiones al encender cada farol (Miedo)
+
+Cada farol encendido trae una reflexión sobre el miedo, apoyada en lo que el
+jugador acaba de hacer:
+
+1. **La alarma se dispara antes** — el cuerpo se acelera antes de comprobar si hay peligro.
+2. **Huir alivia rápido** — correr gasta la linterna; escapar calma al momento y agranda el miedo la próxima vez.
+3. **Respirar no lo apaga** — le baja el volumen lo justo para poder decidir y seguir.
+4. **No hace falta verlo todo** — basta con ver el siguiente paso.
+5. **Con miedo, no sin miedo** — valiente es el que avanza llevándolo encima.
+
+La nota aparece arriba **sin pausar la partida**: el jugador sigue caminando
+mientras la lee, se va sola a los 9 segundos (con una barra que lo indica) y se
+puede cerrar tocándola. Al terminar la isla, la tarjeta final recoge las cinco
+en el orden en que aparecieron.
+
+`MinigameBase.showNote()` queda disponible para cualquier isla que quiera decir
+algo sin interrumpir.

@@ -56,6 +56,7 @@ export class MinigameBase {
         <div class="i3d__bars" data-bars></div>
       </div>
       <div class="i3d__center" data-center aria-live="polite"></div>
+      <div class="i3d__notes" data-notes aria-live="polite"></div>
       <div class="i3d__touch" data-touch hidden>
         <div class="i3d__stick" data-stick><i data-knob></i></div>
         <div class="i3d__buttons">
@@ -73,6 +74,7 @@ export class MinigameBase {
       objective: this.root.querySelector('[data-objective]'),
       bars: this.root.querySelector('[data-bars]'),
       center: this.root.querySelector('[data-center]'),
+      notes: this.root.querySelector('[data-notes]'),
       touch: this.root.querySelector('[data-touch]'),
       overlay: this.root.querySelector('[data-overlay]')
     };
@@ -443,6 +445,30 @@ export class MinigameBase {
   }
 
   clearSay() { this.el.center.innerHTML = ''; }
+
+  /**
+   * Nota que aparece sin cortar la partida: el jugador sigue moviendose
+   * mientras la lee. Se va sola y se puede cerrar tocandola.
+   */
+  showNote({ title = '', text = '', seconds = 8 } = {}) {
+    this.el.notes?.querySelector('.i3d-note')?.remove();
+    const note = document.createElement('div');
+    note.className = 'i3d-note';
+    note.style.setProperty('--dur', `${seconds}s`);
+    note.innerHTML = `
+      ${title ? `<p class="i3d-note__title">${title}</p>` : ''}
+      <p class="i3d-note__text">${text}</p>
+      <span class="i3d-note__bar" aria-hidden="true"></span>
+    `;
+    this.el.notes.appendChild(note);
+    const close = () => {
+      note.classList.add('is-out');
+      this.later(() => note.remove(), 300);
+    };
+    note.addEventListener('click', close);
+    this.later(close, seconds * 1000);
+    return note;
+  }
 
   /* ============================================================== utilidad */
 

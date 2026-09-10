@@ -20,6 +20,31 @@ const LANTERNS = [
   { x: 20, z: 18 }
 ];
 
+// Una reflexion por farol, en el orden en que se encienden. Cada una se apoya
+// en lo que el jugador acaba de hacer, no es un texto suelto.
+const REFLECTIONS = [
+  {
+    title: 'La alarma se dispara antes',
+    text: 'El miedo no espera a comprobar si hay peligro: el cuerpo se acelera primero y la cabeza mira después. Por eso una rama moviéndose puede darte un susto de verdad.'
+  },
+  {
+    title: 'Huir alivia rápido',
+    text: 'Correr gasta la linterna. Con el miedo pasa igual: escapar calma al momento, y la próxima vez la misma situación da un poco más de miedo.'
+  },
+  {
+    title: 'Respirar no lo apaga',
+    text: 'Cuando te detienes a respirar el miedo no desaparece: le baja el volumen lo justo para que puedas decidir y seguir. Eso ya es suficiente.'
+  },
+  {
+    title: 'No hace falta verlo todo',
+    text: 'Nunca has visto el bosque entero, solo lo que alcanza tu luz. Para avanzar basta con ver el siguiente paso.'
+  },
+  {
+    title: 'Con miedo, no sin miedo',
+    text: 'Has cruzado el bosque con el miedo puesto. Esa es la diferencia: valiente no es el que no siente miedo, es el que avanza llevándolo encima.'
+  }
+];
+
 const DRAIN_WALK = 0.026;
 const DRAIN_RUN = 0.085;
 const DRAIN_IDLE = 0.012;
@@ -35,6 +60,7 @@ export class FearNightGame extends MinigameBase {
     this.time = 0;
     this.nextScare = 12 + Math.random() * 8;
     this.dark = false;
+    this.seenReflections = [];
   }
 
   /* ============================================================ escenario */
@@ -304,12 +330,18 @@ export class FearNightGame extends MinigameBase {
     this.battery = Math.min(1, this.battery + 0.25);
     const done = this.advanceObjective();
     const progress = this.objective.done / this.objective.total;
+
+    // cada farol trae una reflexion; no corta la partida, se puede seguir andando
+    const reflection = REFLECTIONS[this.objective.done - 1];
+    if (reflection) {
+      this.seenReflections.push(reflection);
+      this.later(() => this.showNote({ ...reflection, seconds: 9 }), 700);
+    }
     this.feedback.tweenValue(this.scene.fog, 'density', 0.033 - progress * 0.019, 2);
     this.feedback.tweenValue(this.lights.userData.hemi, 'intensity', 0.95 + progress * 0.35, 2);
     completeActivity(`fear-farol-${lantern.index + 1}`, 6);
 
     if (done) this.dawn();
-    else this.say('UN FAROL MENOS DE OSCURIDAD', 1800);
   }
 
   dawn() {
@@ -450,6 +482,7 @@ export class FearNightGame extends MinigameBase {
     this.battery = 1;
     this.dark = false;
     this.scare = null;
+    this.seenReflections = [];
     this.shadowFigure.visible = false;
     this.controller.speedScale = 1;
     this.lanterns.forEach((l) => {
@@ -504,9 +537,8 @@ export class FearNightGame extends MinigameBase {
     this.showClosingCard({
       title: 'Atravesar, no huir',
       lines: [
-        'Correr gastaba la linterna; caminar con calma la conservaba. El miedo se atraviesa a ritmo propio.',
-        'Cuando te quedaste a oscuras no perdiste nada: te detuviste, respiraste y la luz volvió. Quedarse sin recursos un momento no es fracasar.',
-        'Los faroles siguen encendidos detrás de ti. Cada paso pequeño que diste hizo posible el siguiente.'
+        'Los faroles siguen encendidos detrás de ti. Esto es lo que fuiste encontrando:',
+        ...this.seenReflections.map((r) => `<strong>${r.title}.</strong> ${r.text}`)
       ],
       onDone: () => super.finish()
     });
