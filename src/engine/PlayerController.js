@@ -64,7 +64,7 @@ export class PlayerController {
     this.orbit = { distance: 6.2, height: 2.1, targetDistance: 6.2 };
 
     this.keys = Object.create(null);
-    this.touch = { move: { x: 0, y: 0 }, look: { x: 0, y: 0 }, jump: false, interact: false };
+    this.touch = { move: { x: 0, y: 0 }, look: { x: 0, y: 0 }, jump: false, interact: false, runSince: null };
     this.events = { jump: [], step: [], interact: [], land: [] };
     this.pointerLocked = false;
 
@@ -111,7 +111,9 @@ export class PlayerController {
     this._onPointerDown = (e) => {
       if (!this.enabled) return;
       if (e.pointerType !== 'touch' && this.pointerLocked) return;
-      if (e.pointerType === 'touch' && e.clientX < window.innerWidth * 0.4) return; // zona del joystick
+      // el joystick y los botones capturan su propio puntero, asi que aqui solo
+      // llegan los dedos libres: se puede mirar desde cualquier parte de la pantalla
+      if (e.pointerType === 'touch' && this._drag.active) return; // ya hay un dedo mirando
       this._drag.active = true;
       this._drag.id = e.pointerId;
       this._drag.x = e.clientX;
@@ -123,14 +125,28 @@ export class PlayerController {
       const dy = e.clientY - this._drag.y;
       this._drag.x = e.clientX;
       this._drag.y = e.clientY;
-      this.addLook(dx * 0.005, dy * 0.005);
+      const k = e.pointerType === 'touch' ? 0.0065 : 0.005;
+      this.addLook(dx * k, dy * k);
     };
     this._onPointerUp = (e) => {
       if (e.pointerId === this._drag.id) { this._drag.active = false; this._drag.id = null; }
     };
 
+    // Perder el foco (cambiar de pestana, notificacion, llamada) dejaba teclas
+    // y dedos pegados: el jugador seguia caminando solo al volver.
+    this._onBlur = () => {
+      this.keys = Object.create(null);
+      this.touch.move.x = 0;
+      this.touch.move.y = 0;
+      this.touch.run = false;
+      this.touch.runSince = null;
+      this._drag.active = false;
+      this._drag.id = null;
+    };
+
     window.addEventListener('keydown', this._onKeyDown);
     window.addEventListener('keyup', this._onKeyUp);
+    window.addEventListener('blur', this._onBlur);
     document.addEventListener('mousemove', this._onMouseMove);
     document.addEventListener('pointerlockchange', this._onPointerLockChange);
     this.dom.addEventListener('pointerdown', this._onPointerDown);
@@ -206,7 +222,11 @@ export class PlayerController {
   }
 
   get isRunning() {
-    return (this.keys['shift'] || this.touch.run) && !this.frozen;
+    if (this.frozen) return false;
+    if (this.keys['shift']) return true;
+    // en tactil correr es intencional: el stick a fondo y sostenido, no un roce
+    if (this.touch.runSince !== null) return performance.now() - this.touch.runSince > 300;
+    return this.touch.run === true;
   }
 
   update(dt) {
@@ -370,6 +390,7 @@ export class PlayerController {
   dispose() {
     window.removeEventListener('keydown', this._onKeyDown);
     window.removeEventListener('keyup', this._onKeyUp);
+    window.removeEventListener('blur', this._onBlur);
     document.removeEventListener('mousemove', this._onMouseMove);
     document.removeEventListener('pointerlockchange', this._onPointerLockChange);
     this.dom.removeEventListener('pointerdown', this._onPointerDown);

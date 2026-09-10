@@ -282,21 +282,36 @@ export class FearNightGame extends MinigameBase {
   /* ================================================================ input */
 
   bindHold() {
-    const down = (e) => { if (!e || e.button === undefined || e.button === 0) this.holding = true; };
+    const down = () => { this.holding = true; };
     const up = () => { this.holding = false; };
     const canvas = this.renderer.domElement;
-    canvas.addEventListener('mousedown', down);
-    window.addEventListener('mouseup', up);
-    const keyDown = (e) => { if (e.key === 'e' || e.key === 'E' || e.key === ' ') down(); };
-    const keyUp = (e) => { if (e.key === 'e' || e.key === 'E' || e.key === ' ') up(); };
+
+    // Solo raton: en tactil manda el boton E, que captura su propio dedo.
+    // Antes se escuchaba 'mousedown' y el navegador lo emitia tambien al tocar
+    // la pantalla, asi que girar la camara con el dedo activaba la respiracion.
+    const pointerDown = (e) => { if (e.pointerType === 'mouse' && e.button === 0) down(); };
+    const pointerUp = (e) => { if (e.pointerType === 'mouse') up(); };
+    canvas.addEventListener('pointerdown', pointerDown);
+    window.addEventListener('pointerup', pointerUp);
+    window.addEventListener('pointercancel', pointerUp);
+
+    const isHoldKey = (e) => e.key === 'e' || e.key === 'E' || e.key === ' ';
+    const keyDown = (e) => { if (isHoldKey(e)) down(); };
+    const keyUp = (e) => { if (isHoldKey(e)) up(); };
     window.addEventListener('keydown', keyDown);
     window.addEventListener('keyup', keyUp);
-    this.listeners.push(() => canvas.removeEventListener('mousedown', down));
-    this.listeners.push(() => window.removeEventListener('mouseup', up));
+    // cambiar de app no puede dejar al jugador respirando para siempre
+    window.addEventListener('blur', up);
+
+    this.listeners.push(() => canvas.removeEventListener('pointerdown', pointerDown));
+    this.listeners.push(() => window.removeEventListener('pointerup', pointerUp));
+    this.listeners.push(() => window.removeEventListener('pointercancel', pointerUp));
     this.listeners.push(() => window.removeEventListener('keydown', keyDown));
     this.listeners.push(() => window.removeEventListener('keyup', keyUp));
-    this.onHoldStart = () => { this.holding = true; };
-    this.onHoldEnd = () => { this.holding = false; };
+    this.listeners.push(() => window.removeEventListener('blur', up));
+
+    this.onHoldStart = down;
+    this.onHoldEnd = up;
   }
 
   async onStart() {
@@ -305,7 +320,7 @@ export class FearNightGame extends MinigameBase {
       goal: 'Enciende los 5 faroles del bosque',
       hint: 'Correr gasta la linterna. Párate y mantén pulsado para respirar: la luz vuelve. Quedarte a oscuras no te hace perder nada.',
       keys: [['W A S D', 'moverte'], ['Ratón', 'mirar'], ['Shift', 'correr'], ['E', 'encender'], ['Mantener', 'respirar']],
-      touch: [['Joystick', 'moverte'], ['Arrastra', 'mirar'], ['E', 'encender'], ['Mantener E', 'respirar']]
+      touch: [['Joystick', 'moverte'], ['A fondo', 'correr'], ['Arrastra', 'mirar'], ['E', 'encender'], ['Mantener E', 'respirar']]
     });
     this.ambientWind = this.audio.ambient('wind', { volume: 0.3, rate: 0.8 });
     this.say('ENCIENDE LOS FAROLES', 2600);

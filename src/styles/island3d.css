@@ -193,8 +193,8 @@
   position: absolute;
   left: 22px;
   bottom: 22px;
-  width: 118px;
-  height: 118px;
+  width: 132px;
+  height: 132px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.09);
   border: 1px solid rgba(255, 255, 255, 0.22);
@@ -202,13 +202,35 @@
   place-items: center;
   pointer-events: auto;
   touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+/* el area sensible desborda el circulo: el pulgar no tiene que apuntar */
+.i3d__stick::before {
+  content: '';
+  position: absolute;
+  inset: -26px -20px -22px -22px;
+  border-radius: 50%;
+}
+.i3d__stick.is-active {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 .i3d__stick i {
-  width: 52px;
-  height: 52px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.34);
-  transition: transform 60ms linear;
+  pointer-events: none;
+  transition: transform 110ms ease-out, background 140ms ease, box-shadow 140ms ease;
+}
+/* mientras el dedo manda, el pomo sigue sin retardo */
+.i3d__stick.is-active i { transition: background 140ms ease, box-shadow 140ms ease; }
+.i3d__stick.is-run i {
+  background: rgba(245, 165, 36, 0.75);
+  box-shadow: 0 0 14px rgba(245, 165, 36, 0.5);
 }
 .i3d__buttons {
   position: absolute;
@@ -229,6 +251,9 @@
   font: 700 1.1rem/1 inherit;
   cursor: pointer;
   touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 .i3d__tbtn--main {
   width: 78px;
@@ -237,7 +262,8 @@
   color: #2b1a02;
   font-size: 1.3rem;
 }
-.i3d__tbtn:active { transform: scale(0.94); }
+.i3d__tbtn:active,
+.i3d__tbtn.is-down { transform: scale(0.94); filter: brightness(1.18); }
 
 /* --------------------------------------------------------------- paneles */
 

@@ -185,38 +185,123 @@ export class MinigameBase {
     this.listeners.push(() => window.removeEventListener('pointerdown', showTouch));
     if (window.matchMedia('(pointer: coarse)').matches) this.el.touch.hidden = false;
 
-    let active = null;
-    const max = 46;
+    const MAX = 44;          // recorrido maximo del stick en pixeles
+    const DEAD = 0.16;       // zona muerta: los microtemblores no mueven al jugador
+    const RUN_AT = 0.9;      // hay que empujar a fondo...
+    const RUN_HOLD = 300;    // ...y sostenerlo para echar a correr
+    const touch = this.controller.touch;
+    let pointerId = null;
+    let originX = 0;
+    let originY = 0;
+
+    const reset = () => {
+      pointerId = null;
+      knob.style.transform = 'translate(0, 0)';
+      stick.classList.remove('is-active', 'is-run');
+      touch.move.x = 0;
+      touch.move.y = 0;
+      touch.runSince = null;
+    };
+    this._resetStick = reset;
+
+    const start = (e) => {
+      if (pointerId !== null) return;
+      pointerId = e.pointerId;
+      // origen dinamico: manda donde pones el dedo, no el centro del circulo
+      originX = e.clientX;
+      originY = e.clientY;
+      stick.classList.add('is-active');
+      try { stick.setPointerCapture(e.pointerId); } catch { /* sin captura tambien funciona */ }
+      e.preventDefault();
+    };
+
     const move = (e) => {
-      if (active !== e.pointerId) return;
-      const rect = stick.getBoundingClientRect();
-      let dx = e.clientX - (rect.left + rect.width / 2);
-      let dy = e.clientY - (rect.top + rect.height / 2);
+      if (e.pointerId !== pointerId) return;
+      let dx = e.clientX - originX;
+      let dy = e.clientY - originY;
       const d = Math.hypot(dx, dy);
-      if (d > max) { dx = (dx / d) * max; dy = (dy / d) * max; }
+      if (d > MAX) { dx = (dx / d) * MAX; dy = (dy / d) * MAX; }
       knob.style.transform = `translate(${dx}px, ${dy}px)`;
-      this.controller.touch.move.x = dx / max;
-      this.controller.touch.move.y = dy / max;
-      this.controller.touch.run = d > max * 0.85;
+
+      let nx = dx / MAX;
+      let ny = dy / MAX;
+      const mag = Math.hypot(nx, ny);
+      if (mag < DEAD) {
+        nx = 0;
+        ny = 0;
+      } else {
+        // se reescala fuera de la zona muerta: el arranque es suave, no un salto
+        const k = ((mag - DEAD) / (1 - DEAD)) / mag;
+        nx *= k;
+        ny *= k;
+      }
+      touch.move.x = nx;
+      touch.move.y = ny;
+
+      const push = Math.hypot(nx, ny);
+      touch.runSince = push > RUN_AT ? (touch.runSince ?? performance.now()) : null;
+      stick.classList.toggle('is-run', touch.runSince !== null);
     };
+
     const end = (e) => {
-      if (active !== e.pointerId) return;
-      active = null;
-      knob.style.transform = 'translate(0,0)';
-      this.controller.touch.move.x = 0;
-      this.controller.touch.move.y = 0;
-      this.controller.touch.run = false;
+      if (e && e.pointerId !== pointerId) return;
+      reset();
     };
-    stick.addEventListener('pointerdown', (e) => { active = e.pointerId; stick.setPointerCapture(e.pointerId); move(e); });
+
+    stick.addEventListener('pointerdown', start);
     stick.addEventListener('pointermove', move);
     stick.addEventListener('pointerup', end);
     stick.addEventListener('pointercancel', end);
+    // si el navegador quita la captura, el stick vuelve a cero en vez de quedarse pegado
+    stick.addEventListener('lostpointercapture', end);
+    window.addEventListener('pointerup', end);
+    window.addEventListener('pointercancel', end);
+    this.listeners.push(() => window.removeEventListener('pointerup', end));
+    this.listeners.push(() => window.removeEventListener('pointercancel', end));
 
-    jump.addEventListener('pointerdown', (e) => { e.preventDefault(); this.controller.tryJump(); });
-    interact.addEventListener('pointerdown', (e) => { e.preventDefault(); this.interactables.interact(); });
-    // mantener pulsado en el boton principal (respiracion)
-    interact.addEventListener('pointerup', () => this.onHoldEnd?.());
-    interact.addEventListener('pointerdown', () => this.onHoldStart?.());
+    // salir de la app o cambiar de pestana no puede dejar al jugador andando solo
+    const onBlur = () => { reset(); this.releaseButtons?.(); };
+    const onVisibility = () => { if (document.hidden) onBlur(); };
+    window.addEventListener('blur', onBlur);
+    document.addEventListener('visibilitychange', onVisibility);
+    this.listeners.push(() => window.removeEventListener('blur', onBlur));
+    this.listeners.push(() => document.removeEventListener('visibilitychange', onVisibility));
+
+    // Botones con captura: si el dedo se sale del boton, el pulsado se suelta igual
+    const releases = [];
+    const bindButton = (btn, onDown, onUp) => {
+      let id = null;
+      const down = (e) => {
+        if (id !== null) return;
+        e.preventDefault();
+        id = e.pointerId;
+        try { btn.setPointerCapture(e.pointerId); } catch { /* opcional */ }
+        btn.classList.add('is-down');
+        onDown?.();
+      };
+      const up = (e) => {
+        if (id === null) return;
+        if (e && e.pointerId !== undefined && e.pointerId !== id) return;
+        id = null;
+        btn.classList.remove('is-down');
+        onUp?.();
+      };
+      btn.addEventListener('pointerdown', down);
+      btn.addEventListener('pointerup', up);
+      btn.addEventListener('pointercancel', up);
+      btn.addEventListener('lostpointercapture', up);
+      window.addEventListener('pointerup', up);
+      this.listeners.push(() => window.removeEventListener('pointerup', up));
+      releases.push(() => up());
+    };
+    this.releaseButtons = () => releases.forEach((fn) => fn());
+
+    bindButton(jump, () => this.controller.tryJump());
+    bindButton(
+      interact,
+      () => { this.interactables.interact(); this.onHoldStart?.(); },
+      () => this.onHoldEnd?.()
+    );
   }
 
   /* ================================================================= ciclo */
@@ -338,6 +423,9 @@ export class MinigameBase {
     if (next === this.paused) return;
     this.paused = next;
     if (this.paused) {
+      // el dedo se queda sobre el panel de pausa: hay que soltar stick y botones
+      this._resetStick?.();
+      this.releaseButtons?.();
       this.controller.exitPointerLock();
       this.audio?.duck(0.2);
       this._showPauseMenu();
@@ -380,6 +468,8 @@ export class MinigameBase {
     this.objective.done = 0;
     this.renderObjective();
     this.feedback.tweens.length = 0;
+    this._resetStick?.();
+    this.releaseButtons?.();
     this.controller.velocity.set(0, 0, 0);
     this.controller.frozen = false;
     this.controller.speedScale = 1;
