@@ -328,3 +328,24 @@ que justifica la luz de la noche:
 
 Sigue siendo de noche y la linterna sigue siendo necesaria: lo que cambia es que
 ya se puede caminar sin ir a ciegas.
+
+
+## Ajuste · Instrucciones y aviso de girar el teléfono
+
+**Al entrar a cada isla** aparece una tarjeta con: el nombre de la isla, el
+objetivo en una línea, la clave del juego (qué gasta la linterna, qué pasa si
+sueltas antes de tiempo, que equivocarse no cuesta nada) y **los controles**.
+El juego queda en pausa hasta pulsar *Empezar*, y ese clic sirve además para
+desbloquear el audio del navegador.
+
+Los controles se muestran según el dispositivo: teclado en escritorio
+(`W A S D`, `Ratón`, `Shift`, `E`) y gestos en táctil (`Joystick`, `Arrastra`,
+`E`), con una media query de `pointer: coarse`. Las islas que no se caminan
+—Tristeza— muestran los suyos (`Toca`, `Arrastra`, `Dormir`).
+
+La tarjeta se puede volver a abrir desde el menú de pausa con **Cómo se juega**.
+
+**En móvil**, mientras el teléfono esté en vertical se muestra un aviso a
+pantalla completa —"Gira el teléfono"— con un icono que rota. Solo aparece en
+dispositivos táctiles, se puede descartar con *Seguir así* y desaparece solo al
+girar (escuchando el media query, `resize` y `orientationchange`).

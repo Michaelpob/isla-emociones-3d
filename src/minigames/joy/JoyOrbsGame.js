@@ -188,7 +188,14 @@ export class JoyOrbsGame extends MinigameBase {
     return h;
   }
 
-  onStart() {
+  async onStart() {
+    await this.showIntro({
+      eyebrow: 'Valle de la Luz',
+      goal: 'Recoge los 12 orbes de luz',
+      hint: 'No hay que pulsar nada: se recogen al tocarlos. Si encadenas varios sin tocar el suelo, suman combo.',
+      keys: [['W A S D', 'moverte'], ['Espacio', 'saltar'], ['Shift', 'correr'], ['Ratón', 'girar la cámara']],
+      touch: [['Joystick', 'moverte'], ['⤒', 'saltar'], ['Arrastra', 'girar la cámara']]
+    });
     this.ambient = this.audio.ambient('wind', { volume: 0.18, rate: 1.2 });
     this.say('RECOGE LOS ORBES', 2400);
   }

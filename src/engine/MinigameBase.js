@@ -224,6 +224,52 @@ export class MinigameBase {
     throw new Error('build() no implementado');
   }
 
+  /**
+   * Instrucciones al empezar: que hay que hacer y con que se juega.
+   * El juego queda en pausa hasta que el jugador pulsa Empezar, y ese clic
+   * sirve ademas para desbloquear el audio del navegador.
+   * @param {object} intro
+   * @param {string} intro.eyebrow  nombre de la isla
+   * @param {string} intro.goal     objetivo, en una linea
+   * @param {string} [intro.hint]   la clave del juego, en una linea
+   * @param {Array<[string,string]>} [intro.keys]   controles de teclado
+   * @param {Array<[string,string]>} [intro.touch]  controles tactiles
+   */
+  showIntro({ eyebrow = '', goal = '', hint = '', keys = [], touch = [], cta = 'Empezar' } = {}) {
+    this._intro = { eyebrow, goal, hint, keys, touch, cta };
+    return this.interactionIntro();
+  }
+
+  interactionIntro() {
+    const { eyebrow, goal, hint, keys, touch, cta } = this._intro;
+    this.paused = true;
+    const row = ([k, t]) => `<li><kbd>${k}</kbd><span>${t}</span></li>`;
+    return new Promise((resolve) => {
+      const box = document.createElement('div');
+      box.className = 'i3d-intro';
+      box.innerHTML = `
+        <div class="i3d-intro__card" role="dialog" aria-modal="true" aria-label="Como se juega">
+          ${eyebrow ? `<p class="i3d-intro__eyebrow">${eyebrow}</p>` : ''}
+          <h3>${goal}</h3>
+          ${hint ? `<p class="i3d-intro__hint">${hint}</p>` : ''}
+          ${keys.length ? `<ul class="i3d-intro__controls i3d-intro__controls--keys">${keys.map(row).join('')}</ul>` : ''}
+          ${touch.length ? `<ul class="i3d-intro__controls i3d-intro__controls--touch">${touch.map(row).join('')}</ul>` : ''}
+          <button class="i3d-btn i3d-btn--primary" type="button" data-go>${cta}</button>
+        </div>
+      `;
+      this.el.overlay.appendChild(box);
+      const btn = box.querySelector('[data-go]');
+      btn.focus({ preventScroll: true });
+      btn.addEventListener('click', () => {
+        box.remove();
+        this.paused = false;
+        this.clock.getDelta();          // no cuenta el tiempo leyendo
+        this.audio?.setEnabled(gameState.settings.sound);
+        resolve();
+      });
+    });
+  }
+
   start() {
     if (this.running) return;
     this.running = true;
@@ -307,16 +353,22 @@ export class MinigameBase {
         <div class="i3d-panel__actions">
           <button class="i3d-btn i3d-btn--primary" type="button" data-resume>Seguir</button>
           <button class="i3d-btn" type="button" data-restart>Reiniciar</button>
+          <button class="i3d-btn" type="button" data-how>Cómo se juega</button>
           <button class="i3d-btn" type="button" data-toolbox>Mi caja</button>
           <button class="i3d-btn" type="button" data-leave>Salir al mapa</button>
         </div>
-        <p class="i3d-panel__hint">WASD moverse · SHIFT correr · SPACE saltar · E interactuar · ESC pausa</p>
+        <p class="i3d-panel__hint">ESC pausa · F3 rendimiento</p>
       </div>
     `;
     const q = (s) => this.el.overlay.querySelector(s);
     q('[data-resume]').focus({ preventScroll: true });
     q('[data-resume]').addEventListener('click', () => this.togglePause(false));
     q('[data-restart]').addEventListener('click', () => { this.togglePause(false); this.reset(); });
+    q('[data-how]').addEventListener('click', () => {
+      this.el.overlay.innerHTML = '';
+      this.paused = false;
+      if (this._intro) this.interactionIntro();
+    });
     q('[data-toolbox]').addEventListener('click', () => this.onOpenToolbox?.());
     q('[data-leave]').addEventListener('click', () => this.onExitCb?.());
   }

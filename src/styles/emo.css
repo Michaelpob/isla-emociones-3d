@@ -1190,3 +1190,38 @@
 .start-screen__links { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
 .island-panel__meta { display: flex; gap: 12px; flex-wrap: wrap; margin: 10px 0; font-size: 0.86rem; opacity: 0.9; }
 .island-panel--locked { filter: saturate(0.8); }
+
+
+/* ------------------------------------------------- gira el telefono (movil) */
+
+.rotate-hint {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(6, 16, 24, 0.92);
+  backdrop-filter: blur(6px);
+  font-family: var(--emo-font);
+  color: #fff;
+  text-align: center;
+  animation: emo-fade-in 240ms ease;
+}
+.rotate-hint[hidden] { display: none; }
+.rotate-hint__card { max-width: 300px; }
+.rotate-hint__icon {
+  font-size: 62px;
+  line-height: 1;
+  display: block;
+  margin-bottom: 14px;
+  animation: rotate-hint-turn 2.4s ease-in-out infinite;
+}
+.rotate-hint h2 { margin: 0 0 8px; font-size: 1.3rem; }
+.rotate-hint p { margin: 0 0 18px; color: rgba(255, 255, 255, 0.82); line-height: 1.5; }
+.rotate-hint .text-action { color: rgba(255, 255, 255, 0.72); }
+
+@keyframes rotate-hint-turn {
+  0%, 45% { transform: rotate(0deg); }
+  70%, 100% { transform: rotate(-90deg); }
+}

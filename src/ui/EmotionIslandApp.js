@@ -57,10 +57,51 @@ export class EmotionIslandApp {
     });
     this.world.mount();
     this.syncWorldState();
+    this.setupRotateHint();
     if (this.player?.favoriteColor) {
       this.world.setPlayerAppearance(this.player.favoriteColor);
     }
     this.showStart();
+  }
+
+  /**
+   * En movil, la aventura se ve mucho mejor en horizontal: se avisa mientras el
+   * telefono este en vertical. Se puede seguir jugando igual si el jugador
+   * prefiere no girarlo.
+   */
+  setupRotateHint() {
+    const coarse = window.matchMedia('(pointer: coarse)');
+    if (!coarse.matches) return;
+
+    const hint = document.createElement('div');
+    hint.className = 'rotate-hint';
+    hint.hidden = true;
+    hint.innerHTML = `
+      <div class="rotate-hint__card" role="dialog" aria-live="polite">
+        <div class="rotate-hint__icon" aria-hidden="true">📱</div>
+        <h2>Gira el teléfono</h2>
+        <p>La aventura se ve mucho mejor en horizontal.</p>
+        <button class="text-action" type="button" data-rotate-dismiss>Seguir así</button>
+      </div>
+    `;
+    this.root.appendChild(hint);
+    this.rotateHint = hint;
+
+    hint.querySelector('[data-rotate-dismiss]').addEventListener('click', () => {
+      this.rotateDismissed = true;
+      hint.hidden = true;
+    });
+
+    const portrait = window.matchMedia('(orientation: portrait)');
+    const update = () => {
+      hint.hidden = !portrait.matches || this.rotateDismissed;
+    };
+    // algunos navegadores no disparan el change del media query al girar:
+    // se escucha tambien resize y orientationchange
+    portrait.addEventListener('change', update);
+    window.addEventListener('resize', update);
+    window.addEventListener('orientationchange', update);
+    update();
   }
 
   showStart() {

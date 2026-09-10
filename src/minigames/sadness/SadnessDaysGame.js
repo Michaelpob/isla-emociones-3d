@@ -281,6 +281,17 @@ export class SadnessDaysGame extends MinigameBase {
     this.camera.lookAt(this.camTarget);
   }
 
+  async onStart() {
+    await this.showIntro({
+      eyebrow: 'Un día a la vez',
+      goal: 'Haz que la casa vuelva a estar viva',
+      hint: 'Cada día tienes fichas de energía. Toca las cosas y el personaje irá solo. Al dormir, la energía de mañana depende de lo que hayas hecho hoy: quedarte quieto no te quita nada, pero solo sube si haces algo.',
+      keys: [['Clic', 'hacer algo'], ['Arrastra', 'girar la vista'], ['Dormir', 'pasar de día']],
+      touch: [['Toca', 'hacer algo'], ['Arrastra', 'girar la vista'], ['Dormir', 'pasar de día']]
+    });
+    this.say('CUATRO DÍAS POR DELANTE', 2400);
+  }
+
   /* ============================================================== acciones */
 
   buildActions() {

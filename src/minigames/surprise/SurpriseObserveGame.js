@@ -151,7 +151,14 @@ export class SurpriseObserveGame extends MinigameBase {
     this.fountain = fountain;
   }
 
-  onStart() {
+  async onStart() {
+    await this.showIntro({
+      eyebrow: 'El jardín que cambia',
+      goal: 'Descubre los 5 cambios del jardín',
+      hint: 'Algo cambia siempre a tu espalda: nunca delante de tus ojos. Date la vuelta, busca qué es distinto y acércate a señalarlo. Señalar la figura equivocada no cuesta nada.',
+      keys: [['W A S D', 'moverte'], ['Ratón', 'mirar'], ['E', 'señalar']],
+      touch: [['Joystick', 'moverte'], ['Arrastra', 'mirar'], ['E', 'señalar']]
+    });
     this.ambient = this.audio.ambient('pad', { volume: 0.2, rate: 1.1 });
     this.say('ALGO VA A CAMBIAR', 2600);
   }

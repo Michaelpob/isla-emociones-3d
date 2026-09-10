@@ -273,7 +273,14 @@ export class FearNightGame extends MinigameBase {
     this.onHoldEnd = () => { this.holding = false; };
   }
 
-  onStart() {
+  async onStart() {
+    await this.showIntro({
+      eyebrow: 'Isla del Miedo',
+      goal: 'Enciende los 5 faroles del bosque',
+      hint: 'Correr gasta la linterna. Párate y mantén pulsado para respirar: la luz vuelve. Quedarte a oscuras no te hace perder nada.',
+      keys: [['W A S D', 'moverte'], ['Ratón', 'mirar'], ['Shift', 'correr'], ['E', 'encender'], ['Mantener', 'respirar']],
+      touch: [['Joystick', 'moverte'], ['Arrastra', 'mirar'], ['E', 'encender'], ['Mantener E', 'respirar']]
+    });
     this.ambientWind = this.audio.ambient('wind', { volume: 0.3, rate: 0.8 });
     this.say('ENCIENDE LOS FAROLES', 2600);
   }

@@ -247,7 +247,14 @@ export class DisgustSortGame extends MinigameBase {
     }
   }
 
-  onStart() {
+  async onStart() {
+    await this.showIntro({
+      eyebrow: 'Guardianes del Desagrado',
+      goal: 'Limpia las 4 zonas del pantano',
+      hint: 'Empuja cada objeto con tu propio cuerpo hasta el contenedor que le toca: 🚫 lo que se descarta, 💚 lo que se conserva. Si te equivocas, sale rebotado y ya está. Con los tres ordenados, activa la válvula.',
+      keys: [['W A S D', 'empujar'], ['Ratón', 'mirar'], ['E', 'activar la válvula']],
+      touch: [['Joystick', 'empujar'], ['Arrastra', 'mirar'], ['E', 'activar la válvula']]
+    });
     this.ambient = this.audio.ambient('swamp', { volume: 0.35, rate: 0.9 });
     this.say('EMPUJA Y ORDENA', 2400);
     setInitialIntensity('media');

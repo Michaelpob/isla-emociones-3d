@@ -269,7 +269,14 @@ export class AngerVolcanoGame extends MinigameBase {
 
   /* ============================================================ arranque */
 
-  onStart() {
+  async onStart() {
+    await this.showIntro({
+      eyebrow: 'Volcán de las Emociones',
+      goal: 'Apaga los 4 focos de tensión',
+      hint: 'En cada foco, mantén pulsado y sigue el círculo: inhala, sostén, suelta al exhalar. Si sueltas antes de tiempo no pasa nada: se reintenta al momento.',
+      keys: [['W A S D', 'moverte'], ['Ratón', 'mirar'], ['E', 'empezar'], ['Mantener', 'respirar']],
+      touch: [['Joystick', 'moverte'], ['Arrastra', 'mirar'], ['Mantener E', 'respirar']]
+    });
     this.ambientRumble = this.audio.ambient('rumble', { volume: 0.5, rate: 0.85 });
     this.say('LLEGA AL FOCO', 2200);
     this.applyTension();
