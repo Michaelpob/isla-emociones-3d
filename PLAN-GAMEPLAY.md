@@ -311,3 +311,20 @@ insignia y herramienta. 31 draw calls, ~8.200 triángulos, sin errores de consol
 
 El minijuego 3D anterior de Tristeza (`sadness-restore`, «El mundo que vuelve»)
 queda registrado pero fuera de la isla.
+
+## Ajuste · Iluminación de la Isla del Miedo
+
+El bosque estaba demasiado oscuro para orientarse. Ahora hay una **luna visible**
+que justifica la luz de la noche:
+
+- Esfera con halo aditivo y `fog:false` (a esa distancia la niebla se la habría
+  comido), y la luz direccional colocada en la posición de la luna, de modo que
+  las sombras y el tono azul vienen de donde se ve la fuente.
+- Un punto de luz suave bajo la luna y un halo alrededor del jugador algo mayor,
+  para que el suelo cercano se lea sin depender solo de la linterna.
+- Niebla más fina y clara (0,052 → 0,033), cielo y suelo un punto arriba,
+  troncos y copas menos apagados, y exposición de tono 1,32 solo en esta isla.
+- Al amanecer la luna se desvanece junto con su halo.
+
+Sigue siendo de noche y la linterna sigue siendo necesaria: lo que cambia es que
+ya se puede caminar sin ir a ciegas.

@@ -42,15 +42,16 @@ export class FearNightGame extends MinigameBase {
   build() {
     this.root.classList.add('i3d--fp');
     const scene = this.scene;
+    this.renderer.toneMappingExposure = 1.32;
 
-    scene.fog = new THREE.FogExp2('#0b1420', 0.052);
-    this.sky = createSky({ top: '#050a12', bottom: '#132437' });
+    scene.fog = new THREE.FogExp2('#1b2e44', 0.033);
+    this.sky = createSky({ top: '#0a1424', bottom: '#24405e' });
     scene.add(this.sky);
 
     this.ground = createGround({
       size: 100,
       segments: 60,
-      color: '#1d2b26',
+      color: '#36493f',
       amplitude: 0.9,
       scale: 0.06
     });
@@ -64,15 +65,16 @@ export class FearNightGame extends MinigameBase {
     this.controller.cfg.runSpeed = 6.6;
 
     this.lights = createLights({
-      sunColor: '#6f8fbf',
-      sunIntensity: 0.3,
-      hemiSky: '#20344d',
-      hemiGround: '#0a1210',
-      hemiIntensity: 0.46,
+      sunColor: '#a8c4ef',
+      sunIntensity: 1.05,
+      hemiSky: '#2c4a6b',
+      hemiGround: '#283a34',
+      hemiIntensity: 0.95,
       shadows: false
     });
     scene.add(this.lights);
     this.moon = this.lights.userData.sun;
+    this.buildMoon();
 
     this.buildForest();
     this.buildLanterns();
@@ -107,8 +109,8 @@ export class FearNightGame extends MinigameBase {
     }
     this.treeSpots = spots;
 
-    const trunkMat = new THREE.MeshStandardMaterial({ color: '#2b211c', roughness: 1, flatShading: true });
-    const crownMat = new THREE.MeshStandardMaterial({ color: '#26463a', roughness: 1, flatShading: true });
+    const trunkMat = new THREE.MeshStandardMaterial({ color: '#3a2d25', roughness: 1, flatShading: true });
+    const crownMat = new THREE.MeshStandardMaterial({ color: '#33604d', roughness: 1, flatShading: true });
 
     const trunks = scatterInstanced(GEO.trunk(), trunkMat, spots.length, (i) => {
       const s = spots[i];
@@ -131,7 +133,7 @@ export class FearNightGame extends MinigameBase {
     });
 
     // maleza baja, instanciada
-    const grassMat = new THREE.MeshStandardMaterial({ color: '#20402f', roughness: 1, flatShading: true });
+    const grassMat = new THREE.MeshStandardMaterial({ color: '#2c563f', roughness: 1, flatShading: true });
     const grass = scatterInstanced(GEO.grass(), grassMat, 260, (i) => {
       const a = i * 1.618;
       const r = 3 + (i % 60) * 0.52;
@@ -183,6 +185,50 @@ export class FearNightGame extends MinigameBase {
     });
   }
 
+  /** Luna visible: es de donde viene la luz de la noche */
+  buildMoon() {
+    const pos = new THREE.Vector3(-26, 30, -58);
+
+    const disc = new THREE.Mesh(
+      new THREE.SphereGeometry(3.4, 20, 14),
+      // fog:false para que la niebla no se la coma a esa distancia
+      new THREE.MeshBasicMaterial({ color: '#eef4ff', fog: false, transparent: true, opacity: 1 })
+    );
+    disc.position.copy(pos);
+    this.scene.add(disc);
+    this.moonMesh = disc;
+
+    // halo suave alrededor
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+    const grad = ctx.createRadialGradient(64, 64, 6, 64, 64, 64);
+    grad.addColorStop(0, 'rgba(220, 236, 255, 0.85)');
+    grad.addColorStop(0.35, 'rgba(180, 210, 255, 0.28)');
+    grad.addColorStop(1, 'rgba(150, 190, 255, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 128, 128);
+    const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: new THREE.CanvasTexture(canvas),
+      transparent: true,
+      depthWrite: false,
+      fog: false,
+      blending: THREE.AdditiveBlending
+    }));
+    halo.scale.set(26, 26, 1);
+    halo.position.copy(pos);
+    this.scene.add(halo);
+    this.moonHalo = halo;
+
+    // la luz direccional viene de la luna, no de un sitio cualquiera
+    this.moon.position.copy(pos);
+
+    // reflejo azulado en el suelo justo debajo
+    this.moonGlow = new THREE.PointLight('#9fc0ff', 0.7, 46, 1.4);
+    this.moonGlow.position.set(-8, 12, -18);
+    this.scene.add(this.moonGlow);
+  }
+
   buildFlashlight() {
     this.flashlight = new THREE.SpotLight('#ffe6b8', 9, 30, Math.PI / 6.2, 0.5, 1.1);
     this.flashlight.position.set(0, 0, 0);
@@ -193,7 +239,7 @@ export class FearNightGame extends MinigameBase {
     this.scene.add(this.camera);
 
     // halo tenue alrededor del jugador para no perder el suelo del todo
-    this.halo = new THREE.PointLight('#8fb6ff', 0.6, 9, 1.6);
+    this.halo = new THREE.PointLight('#9dc0ff', 0.9, 15, 1.5);
     this.camera.add(this.halo);
   }
 
@@ -251,8 +297,8 @@ export class FearNightGame extends MinigameBase {
     this.battery = Math.min(1, this.battery + 0.25);
     const done = this.advanceObjective();
     const progress = this.objective.done / this.objective.total;
-    this.feedback.tweenValue(this.scene.fog, 'density', 0.052 - progress * 0.028, 2);
-    this.feedback.tweenValue(this.lights.userData.hemi, 'intensity', 0.46 + progress * 0.5, 2);
+    this.feedback.tweenValue(this.scene.fog, 'density', 0.033 - progress * 0.019, 2);
+    this.feedback.tweenValue(this.lights.userData.hemi, 'intensity', 0.95 + progress * 0.35, 2);
     completeActivity(`fear-farol-${lantern.index + 1}`, 6);
 
     if (done) this.dawn();
@@ -267,6 +313,9 @@ export class FearNightGame extends MinigameBase {
     this.feedback.tweenValue(this.moon, 'intensity', 1.45, 4);
     this.feedback.tweenColor(this.moon.color, '#ffd9a8', 4);
     this.feedback.tweenValue(this.lights.userData.hemi, 'intensity', 1.15, 4);
+    this.feedback.tweenValue(this.moonMesh.material, 'opacity', 0, 3.5);
+    this.feedback.tweenValue(this.moonHalo.material, 'opacity', 0, 3);
+    this.feedback.tweenValue(this.moonGlow, 'intensity', 0, 3);
     this.ambientWind?.setVolume(0.12, 2);
 
     this.later(() => {
@@ -356,7 +405,7 @@ export class FearNightGame extends MinigameBase {
     const flicker = low ? 0.55 + Math.random() * 0.45 : 1;
     this.flashlight.intensity = this.dark ? 0 : (2.5 + this.battery * 7) * flicker;
     this.flashlight.angle = Math.PI / 7 * (0.75 + this.battery * 0.35);
-    this.halo.intensity = this.dark ? 0.12 : 0.35 + this.battery * 0.35;
+    this.halo.intensity = this.dark ? 0.22 : 0.6 + this.battery * 0.5;
 
     // sustos suaves espaciados
     this.nextScare -= dt;
@@ -404,11 +453,14 @@ export class FearNightGame extends MinigameBase {
       l.glass.material.emissiveIntensity = 0.2;
       l.light.intensity = 0;
     });
-    this.scene.fog.density = 0.052;
-    this.scene.fog.color.set('#0b1420');
-    this.sky.userData.setColors('#050a12', '#132437');
-    this.lights.userData.hemi.intensity = 0.46;
-    this.moon.intensity = 0.3;
+    this.scene.fog.density = 0.033;
+    this.scene.fog.color.set('#1b2e44');
+    this.sky.userData.setColors('#0a1424', '#24405e');
+    this.lights.userData.hemi.intensity = 0.95;
+    this.moon.intensity = 1.05;
+    this.moonMesh.material.opacity = 1;
+    this.moonHalo.material.opacity = 1;
+    this.moonGlow.intensity = 0.7;
     this.controller.setPosition(0, 3, 24);
     this.controller.yaw = 0;
     if (this.portal) {
